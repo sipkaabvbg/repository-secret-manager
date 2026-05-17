@@ -1,0 +1,38 @@
+{
+  "_version": "1.60.0",
+  "sap.app": {
+    "id": "repository.secret.ui",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "title": "Repository Secret Manager UI",
+    "description": "Frontend for managing repository secrets"
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "dependencies": {
+      "minUI5Version": "1.120.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {}
+      }
+    },
+    "models": {
+      "": {
+        "type": "sap.ui.model.json.JSONModel"
+      }
+    },
+    "rootView": {
+      "viewName": "repository.secret.ui.view.App",
+      "type": "XML",
+      "async": true,
+      "id": "app"
+    }
+  }
+}
