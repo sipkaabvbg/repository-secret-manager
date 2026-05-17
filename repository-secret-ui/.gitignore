@@ -1,0 +1,19 @@
+# --- Node.js ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# --- SAPUI5 / UI5 Tooling ---
+dist/
+.ui5/
+
+# --- IDEs and Editors (VS Code) ---
+.vscode/.project
+.vscode/.jsresource
+.vscode/launch.json
+
+# --- OS generated files ---
+.DS_Store
+Thumbs.db

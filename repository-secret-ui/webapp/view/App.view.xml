@@ -1,0 +1,19 @@
+<mvc:View
+    controllerName="repository.secret.ui.controller.App"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    xmlns="sap.m">
+    <Shell>
+        <App id="app">
+            <pages>
+                <Page title="Repository Secret Manager">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <Text text="Welcome to the CI/CD subsystem for managing secure repository connections and authentication credentials." />
+                        </VBox>
+                    </content>
+                </Page>
+            </pages>
+        </App>
+    </Shell>
+</mvc:View>
