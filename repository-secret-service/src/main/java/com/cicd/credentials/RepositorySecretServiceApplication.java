@@ -1,4 +1,4 @@
-package com.cicd.repository_secret_service;
+package com.cicd.credentials;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

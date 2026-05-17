@@ -1,4 +1,4 @@
-package com.cicd.repository_secret_service;
+package com.cicd.credentials;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
