@@ -49,7 +49,7 @@ public class SecretEntity {
         return secretValue;
     }
 
-    public void setSecretValueValue(String secretValue) {
+    public void setSecretValue(String secretValue) {
         this.secretValue = secretValue;
     }
 }

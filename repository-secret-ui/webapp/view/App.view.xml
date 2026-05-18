@@ -5,7 +5,7 @@
             <items>
                 <!-- tab 1: SECRETS -->
                 <IconTabFilter icon="sap-icon://key" text="Secrets" key="secrets">
-                  <Panel headerText="Add New Secret" class="sapUiMarginBottom">
+                  <Panel headerText="Add New Secret" class="sapUiSmallMarginBottom">
                                     <l:HorizontalLayout>
                                         <Input id="inpSecretName" placeholder="Secret Name (Identifier)" width="250px" class="sapUiSmallMarginEnd"/>
                                         <Input id="inpSecretValue" type="Password" placeholder="Token/Password" width="250px" class="sapUiSmallMarginEnd"/>

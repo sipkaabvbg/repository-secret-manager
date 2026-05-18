@@ -2,3 +2,6 @@ specVersion: "4.0"
 metadata:
   name: repository-secret-ui
 type: application
+framework:
+  name: OpenUI5
+  version: "1.124.0"

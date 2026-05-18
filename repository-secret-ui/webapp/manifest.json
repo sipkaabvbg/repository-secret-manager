@@ -20,12 +20,8 @@
       "minUI5Version": "1.120.0",
       "libs": {
         "sap.m": {},
-        "sap.ui.core": {}
-      }
-    },
-    "models": {
-      "": {
-        "type": "sap.ui.model.json.JSONModel"
+        "sap.ui.core": {},
+        "sap.ui.layout": {}
       }
     },
     "rootView": {
