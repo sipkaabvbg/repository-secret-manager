@@ -28,7 +28,7 @@ public class SecretEntity {
      * Encrypted secret value.
      */
     @Column(nullable = false)
-    private String value;
+    private String secretValue;
 
     public SecretEntity() {
     }
@@ -45,11 +45,11 @@ public class SecretEntity {
         this.name = name;
     }
 
-    public String getValue() {
-        return value;
+    public String getSecretValue() {
+        return secretValue;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setSecretValueValue(String secretValue) {
+        this.secretValue = secretValue;
     }
 }
