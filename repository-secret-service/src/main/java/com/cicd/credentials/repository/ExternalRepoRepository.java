@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
  * Provides standard CRUD operations and database interaction capabilities thanks to Spring Data JPA.
  */
 @Repository
-public interface GitRepoRepository extends JpaRepository<ExternalRepoEntity, Long> {
+public interface ExternalRepoRepository extends JpaRepository<ExternalRepoEntity, Long> {
 }
