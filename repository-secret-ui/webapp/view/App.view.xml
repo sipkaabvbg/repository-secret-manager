@@ -1,19 +1,18 @@
-<mvc:View
-    controllerName="repository.secret.ui.controller.App"
-    xmlns:mvc="sap.ui.core.mvc"
-    displayBlock="true"
-    xmlns="sap.m">
-    <Shell>
-        <App id="app">
-            <pages>
-                <Page title="Repository Secret Manager">
-                    <content>
-                        <VBox class="sapUiMediumMargin">
-                            <Text text="Welcome to the CI/CD subsystem for managing secure repository connections and authentication credentials." />
-                        </VBox>
-                    </content>
-                </Page>
-            </pages>
-        </App>
-    </Shell>
+<mvc:View controllerName="cicd.frontend.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Page title="CI/CD Credentials Subsystem">
+        <IconTabBar id="idIconTabBar" expanded="true">
+            <items>
+                <!-- tab 1: SECRETS -->
+                <IconTabFilter icon="sap-icon://key" text="Secrets" key="secrets">
+                    <!-- -->
+                </IconTabFilter>
+                
+                <!-- tab 2: REPOSITORIES -->
+                <IconTabFilter icon="sap-icon://source-code" text="Repositories" key="repos">
+                    <!--  -->
+                </IconTabFilter>
+            </items>
+        </IconTabBar>
+    </Page>
 </mvc:View>
