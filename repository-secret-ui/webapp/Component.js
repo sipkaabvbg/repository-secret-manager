@@ -1,19 +1,17 @@
 sap.ui.define([
-    "sap/ui/core/mvc/Controller",
-    "sap/ui/model/json/JSONModel"
-], function (Controller, JSONModel) {
+    "sap/ui/core/UIComponent"
+], function (UIComponent) {
     "use strict";
-    return Controller.extend("repository.secret.ui.Component", {
-        onInit: function () {
-           
-            var oData = {
-                secrets: [],
-                repos: [],
-                newSecret: { name: "", value: "" },
-                newRepo: { url: "", secretId: "" }
-            };
-            this.getView().setModel(new JSONModel(oData));
+
+    return UIComponent.extend("repository.secret.ui.Component", {
+        metadata: {
+            manifest: "json"
+        },
+
+        init: function () {
+            UIComponent.prototype.init.apply(this, arguments);
+            
+          //  this.getRouter().initialize();
         }
-        
     });
 });

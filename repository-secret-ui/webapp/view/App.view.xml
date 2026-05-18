@@ -1,11 +1,33 @@
-<mvc:View controllerName="cicd.frontend.controller.Main"
-    xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:core="sap.ui.core">
+<mvc:View controllerName="repository.secret.ui.controller.App"
+    xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout">
     <Page title="CI/CD Credentials Subsystem">
         <IconTabBar id="idIconTabBar" expanded="true">
             <items>
                 <!-- tab 1: SECRETS -->
                 <IconTabFilter icon="sap-icon://key" text="Secrets" key="secrets">
-                    <!-- -->
+                  <Panel headerText="Add New Secret" class="sapUiMarginBottom">
+                                    <l:HorizontalLayout>
+                                        <Input id="inpSecretName" placeholder="Secret Name (Identifier)" width="250px" class="sapUiSmallMarginEnd"/>
+                                        <Input id="inpSecretValue" type="Password" placeholder="Token/Password" width="250px" class="sapUiSmallMarginEnd"/>
+                                        <Button text="Add Secret" type="Emphasized" icon="sap-icon://add" press=".onAddSecret"/>
+                                    </l:HorizontalLayout>
+                                </Panel>
+                                <Table items="{/secrets}">
+                                    <columns>
+                                        <Column><Text text="ID" /></Column>
+                                        <Column><Text text="Secret Name" /></Column>
+                                        <Column hAlign="End"><Text text="Actions" /></Column>
+                                    </columns>
+                                    <items>
+                                        <ColumnListItem>
+                                            <cells>
+                                                <Text text="{id}" />
+                                                <ObjectIdentifier title="{name}" />
+                                                <Button icon="sap-icon://delete" type="Reject" press=".onDeleteSecret"/>
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
                 </IconTabFilter>
                 
                 <!-- tab 2: REPOSITORIES -->
