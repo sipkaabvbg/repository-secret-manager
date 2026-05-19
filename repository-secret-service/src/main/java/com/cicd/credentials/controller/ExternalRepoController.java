@@ -30,18 +30,14 @@ public class ExternalRepoController {
 
     /**
      * Endpoint to register and persist a new repository URL linked to an authentication secret.
-     * Returns HTTP Status 201 (Created) upon successful persistence.
-     * @param url      the URL of the external repository
-     * @param secretId the ID of the associated authentication secret
+     * Accepts a JSON record payload from the frontend.
      * @return ResponseEntity containing the created ExternalRepoEntity and HTTP 201 status
      */
     @PostMapping
-    public ResponseEntity<ExternalRepoEntity> create(@RequestParam String url,
-                                                     @RequestParam Long secretId) {
-        ExternalRepoEntity createdRepo = externalRepoService.create(url, secretId);
+    public ResponseEntity<ExternalRepoEntity> create(@RequestBody com.cicd.credentials.dto.RepoRequest request) {
+        ExternalRepoEntity createdRepo = externalRepoService.create(request.url(), request.secretId());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRepo);
     }
-
     /**
      * Endpoint to retrieve all currently persisted external repository URLs.
      * Returns HTTP Status 200 (OK) by default with the JSON list.
