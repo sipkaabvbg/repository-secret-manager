@@ -31,21 +31,23 @@ public class ExternalRepoService {
     }
 
     /**
-     * Creates and persists a new repository linked to an existing secret.
-     *
+     * Registers a new repository. Supports both Private (with secretId)
+     * and Public (secretId is null) repositories.
      * @param url      the URL of the code repository
      * @param secretId the unique identifier of the authentication secret
      * @return the saved ExternalRepoEntity
      * @throws RuntimeException if the secret with the given ID does not exist
      */
     public ExternalRepoEntity create(String url, Long secretId) {
-        SecretEntity secret = secretRepository.findById(secretId)
-                .orElseThrow(() -> new RuntimeException("Secret not found"));
-
         ExternalRepoEntity repo = new ExternalRepoEntity();
         repo.setUrl(url);
-        repo.setSecret(secret);
-
+        if (secretId != null) {
+            SecretEntity secret = secretRepository.findById(secretId)
+                    .orElseThrow(() -> new RuntimeException("Secret not found"));
+            repo.setSecret(secret);
+        } else {
+            repo.setSecret(null);
+        }
         return externalRepoRepository.save(repo);
     }
 

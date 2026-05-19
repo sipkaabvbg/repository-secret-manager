@@ -28,7 +28,7 @@ public class ExternalRepoEntity {
      * Multiple repositories may reuse the same secret.
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "secret_id")
+    @JoinColumn(name = "secret_id", nullable = true)
     private SecretEntity secret;
 
     public ExternalRepoEntity() {
