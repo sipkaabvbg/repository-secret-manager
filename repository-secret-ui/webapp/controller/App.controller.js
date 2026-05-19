@@ -21,7 +21,7 @@ sap.ui.define([
 
             // Fetch live data from the Spring Boot backend
             this._loadSecrets();
-            console.log("!!!!!!!!!!!!!!!!!!!!!!!Controller Init Started");
+            console.log("Controller Init Started");
         },
 
         /**
@@ -32,7 +32,7 @@ sap.ui.define([
 
             fetch(this.backendUrl)
                 .then(function (oResponse) {
-                    console.log("!!!!!!!!!!!!!Я Response received, Status:", oResponse.status);
+                    console.log("Response received, Status:", oResponse.status);
                     if (!oResponse.ok) {
                         throw new Error("HTTP error! Status: " + oResponse.status);
                     }

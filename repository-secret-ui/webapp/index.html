@@ -1,30 +1,17 @@
 <!DOCTYPE html>
-<html style="width: 100%; height: 100%; margin: 0; padding: 0;">
+<html style="width: 100%; height: 100%;">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Repository Secret Manager</title>
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        html, body {
+        /* Стандартно и чисто разпъване на контейнерите без излишен flexbox */
+        html, body, #content {
             width: 100%;
             height: 100%;
-        }
-        
-        body#content {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        body#content > div {
-            flex: 1;
-            overflow: hidden;
+            margin: 0;
+            padding: 0;
         }
     </style>
 
@@ -32,19 +19,24 @@
         src="https://sdk.openui5.org/resources/sap-ui-core.js"
         data-sap-ui-theme="sap_horizon"
         data-sap-ui-resourceroots='{"repository.secret.ui": "./"}'
+        data-sap-ui-libs="sap.m, sap.ui.layout"
         data-sap-ui-async="true">
     </script>
+    
     <script>
-        sap.ui.require([
-            "sap/ui/core/mvc/XMLView"
-        ], function (XMLView) {
-            XMLView.create({
-                viewName: "repository.secret.ui.view.App"
-            }).then(function (oView) {
-                oView.placeAt("content");
+        sap.ui.getCore().attachInit(function () {
+            sap.ui.require([
+                "sap/ui/core/mvc/XMLView"
+            ], function (XMLView) {
+                XMLView.create({
+                    viewName: "repository.secret.ui.view.App"
+                }).then(function (oView) {
+                    oView.placeAt("content");
+                });
             });
         });
     </script>
 </head>
-<body class="sapUiBody" id="content"></body>
+<body class="sapUiBody" id="content">
+    </body>
 </html>
