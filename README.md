@@ -6,8 +6,13 @@ This project is a subsystem of a CI/CD platform. It provides a web service and a
 **Key Features:**
 - Managing Git repository URLs (CRUD operations).
 - Managing authentication secrets/credentials.
-- Linking repositories with their respective secrets.
+- **Many-to-One Repository Linking:** Multiple repositories can reuse and link to the exact same authentication secret.
+- **Flexible Repository Security:** Supports both Private and Public repositories. For Public repositories, providing a secret is completely optional, and they can be saved with no secret assigned.
 - **Validating repository credentials** (checking if the connection to the repository is successful using the provided secret).
+
+## Database Relations & Architecture
+- **Many-to-One (Repositories ➔ Secrets):** The system uses a `@ManyToOne` Hibernate relationship. This allows authentication credentials to be centralized and shared across different repository tracks.
+- **Optional Secret (Nullable Foreign Key):** If a repository is **Public**, the user can save it without choosing a credential from the dropdown menu. In this case, the frontend sends a `null` payload, and the database stores a `NULL` value in the `secret_id` column. The UI automatically displays these entries as `No Secret (Public)`.
 
 ## Tech Stack
 
