@@ -7,9 +7,12 @@ sap.ui.define([
 
     return Controller.extend("repository.secret.ui.controller.App", {
         
-        // Spring Boot REST API controller
-        backendUrl: "http://localhost:8081/api/v1/secrets",
+        // base REST API controller
+        baseUrl: "http://localhost:8081/api/v1",
 
+        // Dynamic endpoints 
+        get secretsUrl() { return this.baseUrl + "/secrets"; },
+        get reposUrl() { return this.baseUrl + "/repositories"; },
 
         onInit: function () {
             // Initialize an empty JSON model (data will be loaded from the backend database)
@@ -21,6 +24,7 @@ sap.ui.define([
 
             // Fetch live data from the Spring Boot backend
             this._loadSecrets();
+            this._loadRepos();
             console.log("Controller Init Started");
         },
 
@@ -30,7 +34,7 @@ sap.ui.define([
         _loadSecrets: function () {
             var oModel = this.getView().getModel();
 
-            fetch(this.backendUrl)
+            fetch(this.secretsUrl)
                 .then(function (oResponse) {
                     console.log("Response received, Status:", oResponse.status);
                     if (!oResponse.ok) {
@@ -72,7 +76,7 @@ sap.ui.define([
             };
 
             // Send the payload data
-            fetch(this.backendUrl, {
+            fetch(this.secretsUrl, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -111,7 +115,7 @@ sap.ui.define([
             var sSecretId = oBindingContext.getProperty("id"); 
 
             // Send the DELETE request to the specific endpoint resource: /api/v1/secrets/{id}
-            fetch(this.backendUrl + "/" + sSecretId, {
+            fetch(this.secretsUrl + "/" + sSecretId, {
                 method: "DELETE"
             })
             .then(function (oResponse) {
@@ -126,6 +130,101 @@ sap.ui.define([
             .catch(function (oError) {
                 MessageToast.show("Deletion error: " + oError.message);
             });
-        }
+        },
+        /**
+         * Fetches all Repos from the database via REST API
+         */
+        _loadRepos: function () {
+            var oModel = this.getView().getModel();
+            fetch(this.reposUrl)
+                .then(function (oResponse) {
+                    if (!oResponse.ok) throw new Error("HTTP error! Status: " + oResponse.status);
+                    return oResponse.json();
+                })
+                .then(function (aData) {
+                    oModel.setProperty("/repos", Array.isArray(aData) ? aData : []);
+                })
+                .catch(function (oError) {
+                    oModel.setProperty("/repos", []);
+                    MessageToast.show("Error loading repositories: " + oError.message);
+                });
+        },
+        /**
+         * Handles the event when a user adds a new repository.
+         * Validates the input and sends a POST request with the repository payload to the backend.
+         */
+        onAddRepo: function () {
+            var sUrl = this.byId("inpRepoUrl").getValue().trim();
+            var sSecretId = this.byId("selSecret").getSelectedKey();
+
+            if (!sUrl) {
+                MessageToast.show("Please enter a Repository URL.");
+                return;
+            }
+
+            var oNewRepo = {
+                url: sUrl,
+                secretId: sSecretId ? parseInt(sSecretId) : null
+            };
+
+            fetch(this.reposUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(oNewRepo)
+            })
+            .then(function (oResponse) {
+                if (!oResponse.ok) {
+                    throw new Error("Failed to save repository to backend.");
+                }
+                return oResponse.json();
+            })
+            .then(function () {
+                MessageToast.show("Repository added successfully.");
+
+                this.byId("inpRepoUrl").setValue("");
+                this.byId("selSecret").setSelectedKey("");
+
+                this._loadRepos();
+            }.bind(this))
+            .catch(function (oError) {
+                MessageToast.show("Creation error: " + oError.message);
+            });
+        },
+/**
+         * Handles the event when a user deletes an existing repository.
+         * Sends a DELETE request to the backend using the record's database ID.
+         */
+        onDeleteRepo: function (oEvent) {
+            var oBindingContext = oEvent.getSource().getBindingContext();
+            
+            var sRepoId = oBindingContext.getProperty("id"); 
+
+            fetch(this.reposUrl() + "/" + sRepoId, {
+                method: "DELETE"
+            })
+            .then(function (oResponse) {
+                if (!oResponse.ok) {
+                    throw new Error("Failed to delete repository from backend.");
+                }
+                MessageToast.show("Repository deleted successfully.");
+                
+                this._loadRepos();
+            }.bind(this))
+            .catch(function (oError) {
+                MessageToast.show("Deletion error: " + oError.message);
+            });
+        },
+        /**
+         * Formatter: Maps the secret ID to its actual name for the table display.
+         * Returns a fallback string if no secret is assigned or if it's not found.
+         */
+        formatSecretName: function (iSecretId) {
+            if (!iSecretId) return "No Secret (Public)";
+            var aSecrets = this.getView().getModel().getProperty("/secrets");
+            var oSecret = aSecrets.find(s => s.id === iSecretId);
+            return oSecret ? oSecret.name : "Unknown/Deleted Secret";
+        },
     });
 });

@@ -15,14 +15,14 @@
                                 </Panel>
                                 <Table items="{/secrets}" noDataText="No secrets found. Add your first secret.">
                                     <columns>
-                                        <Column><Text text="ID" /></Column>
+                                        <!--Column><Text text="ID" /></Column-->
                                         <Column><Text text="Secret Name" /></Column>
                                         <Column hAlign="End"><Text text="Actions" /></Column>
                                     </columns>
                                     <items>
                                         <ColumnListItem>
                                             <cells>
-                                                <Text text="{id}" />
+                                                <!--Text text="{id}" /-->
                                                 <ObjectIdentifier title="{name}" />
                                                 <Button icon="sap-icon://delete" type="Reject" press=".onDeleteSecret"/>
                                             </cells>
@@ -47,7 +47,7 @@
 
                                 <Table items="{/repos}" noDataText="No repositories linked yet. Use the form to add one.">
                                     <columns>
-                                        <Column><Text text="ID" /></Column>
+                                        <!--Column><Text text="ID" /></Column-->
                                         <Column><Text text="URL" /></Column>
                                         <Column><Text text="Linked Secret" /></Column>
                                         <Column hAlign="End"><Text text="Actions" /></Column>
@@ -55,7 +55,7 @@
                                     <items>
                                         <ColumnListItem>
                                             <cells>
-                                                <Text text="{id}" />
+                                                <!--Text text="{id}" /-->
                                                 <Text text="{url}" />
                                                 <ObjectStatus text="{path: 'secretId', formatter: '.formatSecretName'}" state="{= ${secretId} ? 'Success' : 'None'}" />
                                                 <HBox justifyContent="End">
