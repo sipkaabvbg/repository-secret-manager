@@ -1,5 +1,6 @@
 package com.cicd.credentials.controller;
 
+import com.cicd.credentials.dto.RepoResponse;
 import com.cicd.credentials.entity.ExternalRepoEntity;
 import com.cicd.credentials.service.ExternalRepoService;
 import org.springframework.http.HttpStatus;
@@ -29,14 +30,15 @@ public class ExternalRepoController {
     }
 
     /**
-     * Endpoint to register and persist a new repository URL linked to an authentication secret.
+     * EEndpoint to register and persist a new repository URL linked to an authentication secret.
      * Accepts a JSON record payload from the frontend.
-     * @return ResponseEntity containing the created ExternalRepoEntity and HTTP 201 status
+     * @param request the repository creation request payload
+     * @return ResponseEntity containing the ID of the newly created repository and HTTP 201 status
      */
     @PostMapping
-    public ResponseEntity<ExternalRepoEntity> create(@RequestBody com.cicd.credentials.dto.RepoRequest request) {
+    public ResponseEntity<RepoResponse> create(@RequestBody com.cicd.credentials.dto.RepoRequest request) {
         ExternalRepoEntity createdRepo = externalRepoService.create(request.url(), request.secretId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdRepo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new RepoResponse(createdRepo.getId()));
     }
     /**
      * Endpoint to retrieve all currently persisted external repository URLs.
