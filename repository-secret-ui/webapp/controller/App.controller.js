@@ -28,35 +28,45 @@ sap.ui.define([
             console.log("Controller Init Started");
         },
 
-        /**
-         * Fetches all secrets from the database via REST API
+       /**
+         * Fetches all secrets and separates the data into two model paths:
+         * One clean array for the table view, and one containing a default "Public" option for the dropdown list.
          */
         _loadSecrets: function () {
             var oModel = this.getView().getModel();
 
             fetch(this.secretsUrl)
                 .then(function (oResponse) {
-                    console.log("Response received, Status:", oResponse.status);
                     if (!oResponse.ok) {
                         throw new Error("HTTP error! Status: " + oResponse.status);
                     }
                     return oResponse.json();
                 })
                 .then(function (aData) {
-                     console.log("📥 Raw Data:", aData);
-            console.log("📥 Data Type:", typeof aData);
-            console.log("📥 Is Array:", Array.isArray(aData));
-            console.log("📥 Data Length:", aData ? aData.length : "null");
-                    var aSecrets = (aData && Array.isArray(aData)) ? aData : [];
-                    // Update only the '/secrets' array path with data 
-                    oModel.setProperty("/secrets", aData);
-                })
+                    var aRawSecrets = (aData && Array.isArray(aData)) ? aData : [];
+
+                    // 1. Path for the Secrets tab table (contains only DB records)
+                    oModel.setProperty("/secrets", aRawSecrets);
+
+                    // 2. Separate deep copy path specifically for the Repo creation dropdown select control
+                    var aDropdownData = JSON.parse(JSON.stringify(aRawSecrets));
+                    
+                    // Prepend the Public option exclusively to the dropdown data set
+                    aDropdownData.unshift({
+                        id: "",
+                        name: "-- Public (No Secret) --"
+                    });
+
+                    // Update the isolated dropdown model path
+                    oModel.setProperty("/dropdownSecrets", aDropdownData);
+
+                }.bind(this))
                 .catch(function (oError) {
                     oModel.setProperty("/secrets", []);
+                    oModel.setProperty("/dropdownSecrets", [{ id: "", name: "-- Public (No Secret) --" }]);
                     MessageToast.show("Error loading secrets: " + oError.message);
                 });
         },
-
         /**
          * Sends a new secret object payload to the backend
          */
@@ -136,33 +146,45 @@ sap.ui.define([
          */
         _loadRepos: function () {
             var oModel = this.getView().getModel();
+            
             fetch(this.reposUrl)
-                .then(function (oResponse) {
+                .then(oResponse => {
                     if (!oResponse.ok) throw new Error("HTTP error! Status: " + oResponse.status);
                     return oResponse.json();
                 })
-                .then(function (aData) {
+                .then(aData => {
                     oModel.setProperty("/repos", Array.isArray(aData) ? aData : []);
+                    oModel.refresh(true); // Forces the XML view and ObjectStatus formatters to recalculate
                 })
-                .catch(function (oError) {
+                .catch(oError => {
                     oModel.setProperty("/repos", []);
                     MessageToast.show("Error loading repositories: " + oError.message);
                 });
         },
-        /**
-         * Handles the event when a user adds a new repository.
-         * Validates the input and sends a POST request with the repository payload to the backend.
+       /**
+         * Handles the entry of a new repository, posts it to the backend, 
+         * and updates the local frontend UI model right away.
          */
         onAddRepo: function () {
             var sUrl = this.byId("inpRepoUrl").getValue().trim();
-            var sSecretId = this.byId("selSecret").getSelectedKey();
+            var oSelect = this.byId("selSecret");
+            var sSecretId = oSelect.getSelectedKey();
+            
+            // Safer way to fetch the text from the currently selected item
+            var oSelectedItem = oSelect.getSelectedItem();
+            var sSecretName = "";
+            
+            if (oSelectedItem) {
+                sSecretName = oSelectedItem.getText();
+            }
 
             if (!sUrl) {
                 MessageToast.show("Please enter a Repository URL.");
                 return;
             }
 
-            var oNewRepo = {
+            // Payload structure mapping to the backend Java DTO
+            var oPayload = {
                 url: sUrl,
                 secretId: sSecretId ? parseInt(sSecretId) : null
             };
@@ -172,7 +194,7 @@ sap.ui.define([
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(oNewRepo)
+                body: JSON.stringify(oPayload)
             })
             .then(function (oResponse) {
                 if (!oResponse.ok) {
@@ -180,19 +202,41 @@ sap.ui.define([
                 }
                 return oResponse.json();
             })
-            .then(function () {
+            .then(function (iNewInsertedId) {
                 MessageToast.show("Repository added successfully.");
 
+                // Reset the input fields back to initial states
                 this.byId("inpRepoUrl").setValue("");
-                this.byId("selSecret").setSelectedKey("");
+                this.byId("selSecret").setSelectedKey(""); 
 
-                this._loadRepos();
+                var oModel = this.getView().getModel();
+                var aCurrentRepos = oModel.getProperty("/repos") || [];
+
+                // Check if the user selected a valid secret or the Public option
+                var oLocalSecret = null;
+                if (sSecretId && sSecretName && sSecretId !== "") {
+                    oLocalSecret = {
+                        id: parseInt(sSecretId),
+                        name: sSecretName
+                    };
+                }
+
+                var oLocalNewRepo = {
+                    id: iNewInsertedId,
+                    url: sUrl,
+                    secret: oLocalSecret
+                };
+
+                aCurrentRepos.push(oLocalNewRepo);
+                oModel.setProperty("/repos", aCurrentRepos);
+                oModel.refresh(true); // Forces formatters to re-run immediately
+     this._loadRepos();
             }.bind(this))
             .catch(function (oError) {
                 MessageToast.show("Creation error: " + oError.message);
             });
         },
-/**
+        /**
          * Handles the event when a user deletes an existing repository.
          * Sends a DELETE request to the backend using the record's database ID.
          */
@@ -201,7 +245,7 @@ sap.ui.define([
             
             var sRepoId = oBindingContext.getProperty("id"); 
 
-            fetch(this.reposUrl() + "/" + sRepoId, {
+            fetch(this.reposUrl + "/" + sRepoId, {
                 method: "DELETE"
             })
             .then(function (oResponse) {
@@ -215,16 +259,6 @@ sap.ui.define([
             .catch(function (oError) {
                 MessageToast.show("Deletion error: " + oError.message);
             });
-        },
-        /**
-         * Formatter: Maps the secret ID to its actual name for the table display.
-         * Returns a fallback string if no secret is assigned or if it's not found.
-         */
-        formatSecretName: function (iSecretId) {
-            if (!iSecretId) return "No Secret (Public)";
-            var aSecrets = this.getView().getModel().getProperty("/secrets");
-            var oSecret = aSecrets.find(s => s.id === iSecretId);
-            return oSecret ? oSecret.name : "Unknown/Deleted Secret";
         },
     });
 });

@@ -49,17 +49,6 @@ public class ExternalRepoService {
             repo.setSecret(null);
         }
         return externalRepoRepository.save(repo);
-    }
-
-    /**
-     * Retrieves all repositories from the database.
-     *
-     * @return a list of all registered ExternalRepoEntity objects
-     */
-    public List<ExternalRepoEntity> findAll() {
-        return externalRepoRepository.findAll();
-    }
-
     /**
      * Deletes a repository by its unique identifier.
      *
