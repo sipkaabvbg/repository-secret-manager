@@ -58,7 +58,7 @@
                                         <ColumnListItem>
                                     <cells>
                                         <Text text="{url}" />
-                                   <ObjectStatus   text="{= ${secretName} ? ${secretName} : 'Public repo'}"     state="{= ${secretName} ? 'Success' : 'None'}" />
+                                        <Text text="{secretName}" />
                                         <HBox justifyContent="End">
                                             <Button text="Validate" icon="sap-icon://connected" press=".onValidateRepo" class="sapUiTinyMarginEnd"/>
                                             <Button icon="sap-icon://edit" type="Attention" press=".onEditRepo" tooltip="Edit" class="sapUiTinyMarginEnd" />

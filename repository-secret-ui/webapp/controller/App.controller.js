@@ -260,5 +260,26 @@ sap.ui.define([
                 MessageToast.show("Deletion error: " + oError.message);
             });
         },
+        /**
+         * Форматира текста на тайната.
+         * Ако sName е null или празно, връща 'Public repo'.
+         */
+        formatRepoName: function (sName) {
+            if (sName) {
+                return sName;
+            }
+            return "Public repo";
+        },
+
+        /**
+         * Форматира цвета на текста.
+         * Ако има име (sName), свети зелено (Success). Иначе е нормално (None).
+         */
+        formatRepoState: function (sName) {
+            if (sName) {
+                return "Success";
+            }
+            return "None";
+        },
     });
 });

@@ -1,6 +1,7 @@
 package com.cicd.credentials.controller;
 
-import com.cicd.credentials.dto.RepoResponse;
+import com.cicd.credentials.dto.CreateRepoResponse;
+import com.cicd.credentials.dto.RepoDetailsResponse;
 import com.cicd.credentials.entity.ExternalRepoEntity;
 import com.cicd.credentials.service.ExternalRepoService;
 import org.springframework.http.HttpStatus;
@@ -36,9 +37,9 @@ public class ExternalRepoController {
      * @return ResponseEntity containing the ID of the newly created repository and HTTP 201 status
      */
     @PostMapping
-    public ResponseEntity<RepoResponse> create(@RequestBody com.cicd.credentials.dto.RepoRequest request) {
+    public ResponseEntity<CreateRepoResponse> create(@RequestBody com.cicd.credentials.dto.RepoRequest request) {
         ExternalRepoEntity createdRepo = externalRepoService.create(request.url(), request.secretId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(new RepoResponse(createdRepo.getId()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new CreateRepoResponse(createdRepo.getId()));
     }
     /**
      * Endpoint to retrieve all currently persisted external repository URLs.
@@ -46,8 +47,18 @@ public class ExternalRepoController {
      * @return a list of all registered repositories
      */
     @GetMapping
-    public List<ExternalRepoEntity> getAll() {
-        return externalRepoService.findAll();
+    public List<RepoDetailsResponse> getAll() {
+        List<ExternalRepoEntity> entities = externalRepoService.findAll();
+
+        return entities.stream().map(entity -> {
+            Long secId = null;
+            String secName = null;
+            if (entity.getSecret() != null) {
+                secId = entity.getSecret().getId();
+                secName = entity.getSecret().getName();
+            }
+            return new RepoDetailsResponse(entity.getId(), entity.getUrl(), secId, secName);
+        }).toList();
     }
 
     /**
