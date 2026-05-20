@@ -37,8 +37,10 @@
                                     <l:HorizontalLayout>
                                         <Input id="inpRepoUrl" placeholder="https://github.com/my/repo.git" width="300px" class="sapUiSmallMarginEnd"/>
                                        
-                                        <Select id="selSecret" items="{/secrets}" forceSelection="false" width="200px" class="sapUiSmallMarginEnd">
-                                            <core:Item key="{id}" text="{name}" />
+                                        <Select id="selSecret" forceSelection="false" width="200px" class="sapUiSmallMarginEnd" items="{/dropdownSecrets}">
+                                            <items>
+                                                <core:Item key="{id}" text="{name}" />
+                                            </items>
                                         </Select>
 
                                         <Button text="Add Repo" type="Emphasized" icon="sap-icon://add" press=".onAddRepo"/>
@@ -54,16 +56,16 @@
                                     </columns>
                                     <items>
                                         <ColumnListItem>
-                                            <cells>
-                                                <!--Text text="{id}" /-->
-                                                <Text text="{url}" />
-                                                <ObjectStatus text="{path: 'secretId', formatter: '.formatSecretName'}" state="{= ${secretId} ? 'Success' : 'None'}" />
-                                                <HBox justifyContent="End">
-                                                    <Button text="Validate" icon="sap-icon://connected" press=".onValidateRepo" class="sapUiTinyMarginEnd"/>
-                                                    <Button icon="sap-icon://delete" type="Reject" press=".onDeleteRepo"/>
-                                                </HBox>
-                                            </cells>
-                                        </ColumnListItem>
+                                    <cells>
+                                        <Text text="{url}" />
+                                   <ObjectStatus   text="{= ${secretName} ? ${secretName} : 'Public repo'}"     state="{= ${secretName} ? 'Success' : 'None'}" />
+                                        <HBox justifyContent="End">
+                                            <Button text="Validate" icon="sap-icon://connected" press=".onValidateRepo" class="sapUiTinyMarginEnd"/>
+                                            <Button icon="sap-icon://edit" type="Attention" press=".onEditRepo" tooltip="Edit" class="sapUiTinyMarginEnd" />
+                                            <Button icon="sap-icon://delete" type="Reject" press=".onDeleteRepo"/>
+                                        </HBox>
+                                    </cells>
+                                </ColumnListItem>
                                     </items>
                                 </Table>
                 </IconTabFilter>
