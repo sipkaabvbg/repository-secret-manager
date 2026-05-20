@@ -1,5 +1,6 @@
 package com.cicd.credentials.service;
 
+import com.cicd.credentials.dto.RepoDetailsResponse;
 import com.cicd.credentials.entity.ExternalRepoEntity;
 import com.cicd.credentials.entity.SecretEntity;
 import com.cicd.credentials.repository.ExternalRepoRepository;
@@ -7,6 +8,8 @@ import com.cicd.credentials.repository.SecretRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 /**
  * Service class handling the business logic for managing code repositories
@@ -49,6 +52,15 @@ public class ExternalRepoService {
             repo.setSecret(null);
         }
         return externalRepoRepository.save(repo);
+    }
+
+    /**
+     * Retrieves a list of all External Repositories from the database.
+     * @return A list of all entities of type ExternalRepoEntity.
+     */
+    public List<ExternalRepoEntity> findAll() {
+        return externalRepoRepository.findAll();
+    }
     /**
      * Deletes a repository by its unique identifier.
      *
