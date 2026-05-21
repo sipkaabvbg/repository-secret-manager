@@ -69,13 +69,15 @@ sap.ui.define([
         /*
          * Sends a new secret object payload to the backend
          */
-        onAddSecret: function () {
+       onAddSecret: function () {
             var sName = this.byId("inpSecretName").getValue().trim();
             var sProvider = this.byId("selProviderType").getSelectedKey();
             
+            // If provider is GITHUB, get specific type (PAT, SSH, APP). Otherwise, default to GENERIC.
             var sSpecificType = (sProvider === "GITHUB") ? this.byId("selGithubType").getSelectedKey() : "GENERIC";
 
             var sValue = "";
+            // Check which field is visible to extract the real secret value
             if (this.byId("inpSecretKey").getVisible()) {
                 sValue = this.byId("inpSecretKey").getValue().trim(); 
             } else {
@@ -83,15 +85,16 @@ sap.ui.define([
             }
 
             if (!sName || !sValue || !sProvider) {
-                MessageToast.show("Please fill all required fields.");
+                sap.m.MessageToast.show("Please fill all required fields.");
                 return;
             }
 
+            // Construct payload matching the fields of Java SecretEntity 1:1
             var oNewSecret = {
                 name: sName,
                 secretValue: sValue,
-                providerType: sProvider,
-                secretType: sSpecificType 
+                provider: sProvider,   // CHANGED: Matches Java field 'private String provider;'
+                secretType: sSpecificType // Matches Java field 'private String secretType;'
             };
 
             fetch(this.secretsUrl, {
@@ -108,7 +111,7 @@ sap.ui.define([
                 return oResponse.json();
             })
             .then(function () {
-                MessageToast.show("Secret added successfully.");
+                sap.m.MessageToast.show("Secret added successfully.");
 
                 // Clear the form input fields
                 this.byId("inpSecretName").setValue("");
@@ -119,7 +122,7 @@ sap.ui.define([
                 this._loadSecrets();
             }.bind(this))
             .catch(function (oError) {
-                MessageToast.show("Creation error: " + oError.message);
+                sap.m.MessageToast.show("Creation error: " + oError.message);
             });
         },
 
