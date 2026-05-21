@@ -23,6 +23,14 @@
                                         <Button text="Add Secret" type="Emphasized" icon="sap-icon://add" press=".onAddSecret"/>
                                     </l:HorizontalLayout>
                                 </Panel>
+                                 <HBox id="boxGithubType" class="sapUiSmallMarginBottom" alignItems="Center" visible="false">
+            <Label text="GitHub Secret Type: " class="sapUiTinyMarginEnd" design="Bold"/>
+            <Select id="selGithubType" forceSelection="true" width="200px" change=".onGithubTypeChange">
+                <core:Item key="PAT" text="Personal Access Token (PAT)" />
+                <core:Item key="SSH" text="SSH Private Key" />
+                <core:Item key="APP" text="GitHub App (PEM Key)" />
+            </Select>
+        </HBox>
                                 <Table items="{/secrets}" noDataText="No secrets found. Add your first secret.">
                                     <columns>
                                         <!--Column><Text text="ID" /></Column-->
@@ -47,6 +55,7 @@
                 <IconTabFilter icon="sap-icon://source-code" text="Repositories" key="repos">
                    <Panel headerText="Add New Repository" class="sapUiMarginBottom">
                                     <l:HorizontalLayout>
+                                        <Input id="inpRepoName" placeholder="Repository Name" width="200px" class="sapUiSmallMarginEnd"/>
                                         <Input id="inpRepoUrl" placeholder="https://github.com/my/repo.git" width="300px" class="sapUiSmallMarginEnd"/>
                                        
                                         <Select id="selSecret" forceSelection="false" width="200px" class="sapUiSmallMarginEnd" items="{/dropdownSecrets}">
@@ -61,7 +70,7 @@
 
                                 <Table items="{/repos}" noDataText="No repositories linked yet. Use the form to add one.">
                                     <columns>
-                                        <!--Column><Text text="ID" /></Column-->
+                                        <Column><Text text="Name" /></Column>
                                         <Column><Text text="URL" /></Column>
                                         <Column><Text text="Linked Secret" /></Column>
                                         <Column hAlign="End"><Text text="Actions" /></Column>
@@ -69,6 +78,7 @@
                                     <items>
                                         <ColumnListItem>
                                     <cells>
+                                        <ObjectIdentifier title="{name}" />
                                         <Text text="{url}" />
                                         <Text text="{secretName}" />
                                         <HBox justifyContent="End">
