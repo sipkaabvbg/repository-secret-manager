@@ -20,5 +20,5 @@ public class ValidationController {
 
     @PostMapping
     public ValidationResponse validate(@RequestBody ValidationRequest request) {
-        return service.validate(request.repoUrl(), request.credential());
+        return service.validate(request.repoUrl(), request.secretId());
     }}
