@@ -38,7 +38,7 @@ public class ExternalRepoController {
      */
     @PostMapping
     public ResponseEntity<CreateRepoResponse> create(@RequestBody com.cicd.credentials.dto.RepoRequest request) {
-        ExternalRepoEntity createdRepo = externalRepoService.create(request.url(), request.secretId());
+        ExternalRepoEntity createdRepo = externalRepoService.create(request.name(),request.url(), request.secretId());
         return ResponseEntity.status(HttpStatus.CREATED).body(new CreateRepoResponse(createdRepo.getId()));
     }
     /**
