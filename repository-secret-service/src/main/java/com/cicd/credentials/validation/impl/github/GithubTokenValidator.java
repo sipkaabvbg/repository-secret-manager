@@ -14,21 +14,12 @@ public class GithubTokenValidator implements CredentialValidator {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-  /**  @Override
-    public boolean supports(Provider provider, AuthMethod authMethod) {
-        // This validator handles ONLY GitHub + Token auth
-        return provider == Provider.GITHUB
-                && authMethod == AuthMethod.TOKEN;
-    }
-*/
     @Override
     public ValidationResponse validate(String repo, String credential) {
 
         try {
             HttpHeaders headers = new HttpHeaders();
 
-            // Bearer token authentication
-           // headers.setBearerAuth(credential.getSecret());
             headers.setBearerAuth(credential);
             HttpEntity<Void> entity = new HttpEntity<>(headers);
 

@@ -16,12 +16,6 @@ public class GithubBasicAuthValidator implements CredentialValidator {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-  /**  @Override
-    public boolean supports(Provider provider, AuthMethod authMethod) {
-        return provider == Provider.GITHUB
-                && authMethod == AuthMethod.BASIC;
-    }
-*/
     @Override
     public ValidationResponse validate(String repo, String credential) {
 
@@ -56,4 +50,5 @@ public class GithubBasicAuthValidator implements CredentialValidator {
         String cleaned = repoUrl.replace("https://github.com/", "");
         return "https://api.github.com/repos/" + cleaned;
     }
+
 }
