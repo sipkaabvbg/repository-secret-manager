@@ -2,6 +2,7 @@ package com.cicd.credentials.controller;
 
 import com.cicd.credentials.dto.SecretCreateRequest;
 import com.cicd.credentials.dto.SecretCreatedResponse;
+import com.cicd.credentials.dto.SecretDetailsResponse;
 import com.cicd.credentials.entity.SecretEntity;
 import com.cicd.credentials.service.SecretService;
 import org.springframework.http.HttpStatus;
@@ -42,8 +43,16 @@ public class SecretController {
      * * @return A list of all stored secrets.
      */
     @GetMapping
-    public List<SecretEntity> getAll() {
-        return secretService.findAll();
+    public List<SecretDetailsResponse> getAll() {
+        List<SecretEntity> secretEntities = secretService.findAll();
+        return secretEntities.stream()
+                .map(entity -> new SecretDetailsResponse(
+                        entity.getId(),
+                        entity.getName(),
+                        entity.getProvider(),
+                        false // Forces 'editable' to be false initially so SAPUI5 renders read-only texts
+                ))
+                .toList();
     }
 
     /**

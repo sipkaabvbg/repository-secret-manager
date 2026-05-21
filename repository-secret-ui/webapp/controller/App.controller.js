@@ -44,6 +44,12 @@ sap.ui.define([
                 .then(function (aData) {
                     var aRawSecrets = (aData && Array.isArray(aData)) ? aData : [];
 
+                    aRawSecrets.forEach(function (oSecret) {
+                        if (oSecret.editable === undefined) {
+                            oSecret.editable = false; 
+                        }
+                    });
+
 				   // 1. Path for the Secrets tab table (contains only DB records)
                     oModel.setProperty("/secrets", aRawSecrets);
 
@@ -407,6 +413,64 @@ sap.ui.define([
             })
             .catch(function (error) {
                 sap.m.MessageToast.show("Error connecting to server: " + error);
+            });
+        },
+        //SECRET
+        // 1. Triggered when clicking the Edit button (the pencil icon)
+        onEditSecret: function (oEvent) {
+            var oContext = oEvent.getSource().getBindingContext();
+            
+            // Create a backup copy of current data in case the user cancels the action
+            this._oOriginalSecretData = Object.assign({}, oContext.getObject());
+            
+            // Activate edit mode only for this specific row
+            oContext.getModel().setProperty(oContext.getPath() + "/editable", true);
+        },
+
+        // 2. Triggered when clicking the Cancel button
+        onCancelEditSecret: function (oEvent) {
+            var oContext = oEvent.getSource().getBindingContext();
+            var oModel = oContext.getModel();
+            var sPath = oContext.getPath();
+
+            // Restore the original values from before the edit session started
+            oModel.setProperty(sPath + "/name", this._oOriginalSecretData.name);
+            oModel.setProperty(sPath + "/provider", this._oOriginalSecretData.provider);
+            
+            // Lock the row back into read-only mode
+            oModel.setProperty(sPath + "/editable", false);
+        },
+
+        // 3. Triggered when clicking the Save button (the diskette icon)
+        onSaveSecret: function (oEvent) {
+            var oContext = oEvent.getSource().getBindingContext();
+            var oModel = oContext.getModel();
+            var sPath = oContext.getPath();
+            var oEditedSecret = oContext.getObject(); // Retrieve updated data from the model
+
+            // Send HTTP PUT request to update the secret inside the Spring Boot database
+            fetch(this.secretsUrl+"/" + oEditedSecret.id, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: oEditedSecret.name,
+                    provider: oEditedSecret.provider
+                })
+            })
+            .then(function (response) {
+                if (response.ok) {
+                    sap.m.MessageToast.show("Secret updated successfully!");
+                    
+                    // Lock the row back into read-only mode
+                    oModel.setProperty(sPath + "/editable", false);
+                } else {
+                    sap.m.MessageToast.show("Failed to update secret.");
+                }
+            })
+            .catch(function (error) {
+                sap.m.MessageToast.show("Network error: " + error);
             });
         },
     });

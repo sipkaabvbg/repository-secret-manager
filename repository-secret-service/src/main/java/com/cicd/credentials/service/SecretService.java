@@ -39,7 +39,7 @@ public class SecretService {
         );
 
         SecretEntity savedSecret = secretRepository.save(secretEntity);
-        return new SecretCreatedResponse(savedSecret.getId());
+        return new SecretCreatedResponse(savedSecret.getId(),false);
     }
 
     /**

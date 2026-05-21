@@ -36,22 +36,43 @@
                         </VBox>
                     </Panel>
 
-                    <Table items="{/secrets}" noDataText="No secrets found. Add your first secret.">
-                        <columns>
-                            <Column><Text text="Secret Name" /></Column>
-                            <Column><Text text="Provider" /></Column>
-                            <Column hAlign="End"><Text text="Actions" /></Column>
-                        </columns>
-                        <items>
-                            <ColumnListItem>
-                                <cells>
-                                    <ObjectIdentifier title="{name}" />
-                                    <Text text="{provider}" /> 
-                                    <Button icon="sap-icon://delete" type="Reject" press=".onDeleteSecret"/>
-                                </cells>
-                            </ColumnListItem>
-                        </items>
-                    </Table>
+                        <Table items="{/secrets}" noDataText="No secrets found. Add your first secret.">
+                            <columns>
+                                <Column><Text text="Secret Name" /></Column>
+                                <Column><Text text="Provider" /></Column>
+                                <Column hAlign="End"><Text text="Actions" /></Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>
+                                        <VBox>
+                                            <ObjectIdentifier title="{name}" visible="{= !${editable} }" />
+                                            <Input value="{name}" visible="{editable}" width="150px" />
+                                          
+                                        </VBox>
+
+                                        <VBox>
+                                            <Text text="{provider}" visible="{= !${editable} }" />
+                                            <Select selectedKey="{provider}"  visible="{editable}" width="150px">
+                                                <items>
+                                                    <core:Item key="GITHUB" text="GitHub" />
+                                                    <core:Item key="GITLAB" text="GitLab" />
+                                                    <core:Item key="OTHER" text="Other Provider" />
+                                                </items>
+                                            </Select>
+                                        </VBox>
+
+                                        <HBox justifyContent="End">
+                                            <Button icon="sap-icon://edit" type="Attention" press=".onEditSecret"  visible="{= !${editable} }" class="sapUiTinyMarginEnd" />
+                                            <Button icon="sap-icon://delete" type="Reject" press=".onDeleteSecret"  visible="{= !${editable} }" />
+                                                                                                                     
+                                            <Button icon="sap-icon://save" text="Save" type="Accept" press=".onSaveSecret" visible="{editable}" class="sapUiTinyMarginEnd" />
+                                            <Button icon="sap-icon://sys-cancel" text="Cancel" press=".onCancelEditSecret" visible="{editable}" />
+                                        </HBox>
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
                 </IconTabFilter>
                 
                 <!-- tab 2: REPOSITORIES -->
