@@ -3,7 +3,6 @@ MERGE INTO credential_types (code, display_name)
     KEY(code)
     VALUES
     ('TOKEN', 'Personal Access Token'),
-    ('BASIC', 'Username and Password'),
     ('SSH', 'SSH Private Key');
 
 -- 2. Insert the GitHub provider into 'providers'
@@ -16,7 +15,7 @@ MERGE INTO providers (name)
 INSERT INTO provider_credential_types (provider_id, credential_type_id)
 SELECT p.id, ct.id
 FROM providers p
-         JOIN credential_types ct ON ct.code IN ('TOKEN', 'BASIC', 'SSH')
+         JOIN credential_types ct ON ct.code IN ('TOKEN', 'SSH')
 WHERE p.name = 'GitHub'
   AND NOT EXISTS (
     SELECT 1

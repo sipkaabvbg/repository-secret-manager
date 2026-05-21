@@ -22,19 +22,24 @@ public class ValidationService {
         this.validators = validators;
         this.secretRepository = secretRepository;
     }
+
  public ValidationResponse validate(
          String repoUrl,
-         Long credentialId)
-  {
+         Long credentialId) {
      SecretEntity secret = secretRepository.findById(credentialId)
-             .orElseThrow(() -> new RuntimeException("Secret not found with ID: " + credentialId));
-   String credential=secret.getSecretValue();
-     // Iterate through all registered validators
-     for (CredentialValidator validator : validators) {
-         if(validator.getClass().getName().contains("GithubTokenValidator")){
+             .orElseThrow(() -> new RuntimeException("Secret not found"));
+     // Find matching strategy at runtime
+     CredentialValidator validator = validators.stream()
+             .filter(v -> v.supports(
+                     secret.getProvider(),
+                     secret.getSecretType()
+             ))
+             .findFirst()
+             .orElseThrow(() ->
+                     new RuntimeException("No validator found")
+             );
 
-             return validator.validate(repoUrl, credential);
-     }
-     }
-      return null;
-}}
+     // Delegate validation to selected strategy
+     return validator.validate(repoUrl, secret.getSecretValue());
+  }
+}
