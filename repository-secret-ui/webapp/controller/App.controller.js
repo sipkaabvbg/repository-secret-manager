@@ -346,6 +346,68 @@ sap.ui.define([
             .catch(function (oError) {
                 sap.m.MessageToast.show("Validation connection error: " + oError.message);
             });
-        }
+        },
+        //EDIT REPO
+        // 1. Triggered when clicking the Edit button (the pencil icon)
+        onEditRepo: function (oEvent) {
+            var oContext = oEvent.getSource().getBindingContext();
+            
+            // Create a shallow/deep copy of current data in case the user cancels the action
+            this._oOriginalRepoData = Object.assign({}, oContext.getObject());
+            
+            // Activate edit mode only for this specific row
+            oContext.getModel().setProperty(oContext.getPath() + "/editable", true);
+        },
+
+        // 2. Triggered when clicking the Cancel button
+        onCancelEditRepo: function (oEvent) {
+            var oContext = oEvent.getSource().getBindingContext();
+            var oModel = oContext.getModel();
+            var sPath = oContext.getPath();
+
+            // Restore the original values from before the edit session started
+            oModel.setProperty(sPath + "/name", this._oOriginalRepoData.name);
+            oModel.setProperty(sPath + "/url", this._oOriginalRepoData.url);
+            oModel.setProperty(sPath + "/secretId", this._oOriginalRepoData.secretId);
+            
+            // Lock the row back into read-only mode
+            oModel.setProperty(sPath + "/editable", false);
+        },
+
+        // 3. Triggered when clicking the Save button (the diskette icon)
+        onSaveRepo: function (oEvent) {
+            var oContext = oEvent.getSource().getBindingContext();
+            var oModel = oContext.getModel();
+            var sPath = oContext.getPath();
+            var oEditedRepo = oContext.getObject(); // Retrieve the updated data from the model
+
+            // Request to your backend controller for the update (usually PUT or POST)
+            fetch(this.reposUrl +"/"+ oEditedRepo.id, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: oEditedRepo.name,
+                    url: oEditedRepo.url,
+                    secretId: oEditedRepo.secretId // Send the new secret ID if it was changed
+                })
+            })
+            .then(function (response) {
+                if (response.ok) {
+                    sap.m.MessageToast.show("Repository updated successfully!");
+                    
+                    // Important: You can either reload the entire list from the backend here or manually update the secretName on screen
+                    
+                    // Lock the row back into read-only mode
+                    oModel.setProperty(sPath + "/editable", false);
+                } else {
+                    sap.m.MessageToast.show("Failed to update repository.");
+                }
+            })
+            .catch(function (error) {
+                sap.m.MessageToast.show("Error connecting to server: " + error);
+            });
+        },
     });
 });

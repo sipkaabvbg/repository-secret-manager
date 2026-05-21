@@ -80,17 +80,36 @@
                                     </columns>
                                     <items>
                                         <ColumnListItem>
-                                    <cells>
-                                        <ObjectIdentifier title="{name}" />
-                                        <Text text="{url}" />
-                                        <Text text="{secretName}" />
-                                        <HBox justifyContent="End">
-                                            <Button text="Validate" icon="sap-icon://connected" press=".onValidateRepo" class="sapUiTinyMarginEnd"/>
-                                            <Button icon="sap-icon://edit" type="Attention" press=".onEditRepo" tooltip="Edit" class="sapUiTinyMarginEnd" />
-                                            <Button icon="sap-icon://delete" type="Reject" press=".onDeleteRepo"/>
-                                        </HBox>
-                                    </cells>
-                                </ColumnListItem>
+                                            <cells>
+                                                <VBox>
+                                                    <ObjectIdentifier title="{name}" visible="{= !${editable} }" />
+                                                    <Input value="{name}" visible="{editable}" width="150px" />
+                                                </VBox>
+
+                                                <VBox>
+                                                    <Text text="{url}" visible="{= !${editable} }" />
+                                                    <Input value="{url}" visible="{editable}" width="250px" />
+                                                </VBox>
+
+                                                <VBox>
+                                                    <Text text="{secretName}" visible="{= !${editable} }" />
+                                                    <Select selectedKey="{secretId}" visible="{editable}" items="{/dropdownSecrets}" width="150px">
+                                                        <items>
+                                                            <core:Item key="{id}" text="{name}" />
+                                                        </items>
+                                                    </Select>
+                                                </VBox>
+
+                                                <HBox justifyContent="End">
+                                                    <Button text="Validate" icon="sap-icon://connected" press=".onValidateRepo" visible="{= !${editable} }" class="sapUiTinyMarginEnd"/>
+                                                    <Button icon="sap-icon://edit" type="Attention" press=".onEditRepo" tooltip="Edit" visible="{= !${editable} }" class="sapUiTinyMarginEnd" />
+                                                    <Button icon="sap-icon://delete" type="Reject" press=".onDeleteRepo" visible="{= !${editable} }" />
+
+                                                    <Button icon="sap-icon://save" text="Save" type="Accept" press=".onSaveRepo" visible="{editable}" class="sapUiTinyMarginEnd" />
+                                                    <Button icon="sap-icon://sys-cancel" text="Cancel" press=".onCancelEditRepo" visible="{editable}" />
+                                                </HBox>
+                                            </cells>
+                                        </ColumnListItem>
                                     </items>
                                 </Table>
                 </IconTabFilter>
