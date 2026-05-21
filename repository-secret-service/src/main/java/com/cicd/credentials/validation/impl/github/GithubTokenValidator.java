@@ -59,6 +59,9 @@ public class GithubTokenValidator implements CredentialValidator {
      */
     private String toGithubApi(String repoUrl) {
         String cleaned = repoUrl.replace("https://github.com/", "");
+        if (cleaned.endsWith(".git")) {
+            cleaned = cleaned.substring(0, cleaned.length() - 4);
+        }
         return "https://api.github.com/repos/" + cleaned;
     }
 }
