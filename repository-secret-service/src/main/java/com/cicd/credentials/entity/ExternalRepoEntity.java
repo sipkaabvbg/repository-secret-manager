@@ -18,6 +18,12 @@ public class ExternalRepoEntity {
     private Long id;
 
     /**
+     * Human-readable repository name.
+     */
+    @Column(nullable = false)
+    private String name;
+
+    /**
      * Repository URL
      */
     @Column(nullable = false, unique = true)
@@ -37,6 +43,10 @@ public class ExternalRepoEntity {
     public Long getId() {
         return id;
     }
+
+    public String getName() { return name; }
+
+    public void setName(String name) { this.name = name; }
 
     public String getUrl() {
         return url;

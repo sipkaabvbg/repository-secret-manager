@@ -41,9 +41,10 @@ public class ExternalRepoService {
      * @return the saved ExternalRepoEntity
      * @throws RuntimeException if the secret with the given ID does not exist
      */
-    public ExternalRepoEntity create(String url, Long secretId) {
+    public ExternalRepoEntity create(String name,String url, Long secretId) {
         ExternalRepoEntity repo = new ExternalRepoEntity();
         repo.setUrl(url);
+        repo.setName(name);
         if (secretId != null) {
             SecretEntity secret = secretRepository.findById(secretId)
                     .orElseThrow(() -> new RuntimeException("Secret not found"));
