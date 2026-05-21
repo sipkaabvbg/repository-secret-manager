@@ -31,7 +31,6 @@ public class SecretService {
      * @return the saved SecretEntity including its generated database ID
      */
     public SecretCreatedResponse create(SecretCreateRequest request) {
-        // 1. Map incoming DTO to Entity
         SecretEntity secretEntity = new SecretEntity(
                 request.name(),
                 request.secretValue(),

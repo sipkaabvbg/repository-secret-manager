@@ -34,11 +34,8 @@ public class SecretController {
      * and 201 Created status on successful POST
      */
     @PostMapping
-    public ResponseEntity< SecretCreatedResponse> create(@RequestBody SecretCreateRequest request) {
-        // Persist the entity via service
-        SecretEntity savedSecret = secretService.create(request);
-        SecretCreatedResponse response = new SecretCreatedResponse(savedSecret.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<SecretCreatedResponse> create(@RequestBody SecretCreateRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(secretService.create(request));
     }
     /**
      * Endpoint to list all persisted secrets in the system.

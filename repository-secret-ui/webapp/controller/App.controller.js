@@ -73,11 +73,10 @@ sap.ui.define([
             var sName = this.byId("inpSecretName").getValue().trim();
             var sProvider = this.byId("selProviderType").getSelectedKey();
             
-            // If provider is GITHUB, get specific type (PAT, SSH, APP). Otherwise, default to GENERIC.
+            // Matches your logic: GITHUB -> specific type, otherwise GENERIC
             var sSpecificType = (sProvider === "GITHUB") ? this.byId("selGithubType").getSelectedKey() : "GENERIC";
 
             var sValue = "";
-            // Check which field is visible to extract the real secret value
             if (this.byId("inpSecretKey").getVisible()) {
                 sValue = this.byId("inpSecretKey").getValue().trim(); 
             } else {
@@ -89,12 +88,12 @@ sap.ui.define([
                 return;
             }
 
-            // Construct payload matching the fields of Java SecretEntity 1:1
+            // FIX: This object MUST look exactly like your current Java Entity class fields!
             var oNewSecret = {
                 name: sName,
                 secretValue: sValue,
-                provider: sProvider,   // CHANGED: Matches Java field 'private String provider;'
-                secretType: sSpecificType // Matches Java field 'private String secretType;'
+                provider: sProvider,  
+                secretType: sSpecificType
             };
 
             fetch(this.secretsUrl, {
@@ -102,7 +101,7 @@ sap.ui.define([
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(oNewSecret)
+                body: JSON.stringify(oNewSecret) // Serializes the exact object
             })
             .then(function (oResponse) {
                 if (!oResponse.ok) {
@@ -110,15 +109,15 @@ sap.ui.define([
                 }
                 return oResponse.json();
             })
-            .then(function () {
+            .then(function (oData) {
                 sap.m.MessageToast.show("Secret added successfully.");
 
-                // Clear the form input fields
+                // Clear input forms
                 this.byId("inpSecretName").setValue("");
                 this.byId("inpSecretToken").setValue("");
                 this.byId("inpSecretKey").setValue("");
 
-                // Reload the table directly from the database to reflect the changes
+                // Refresh model/table
                 this._loadSecrets();
             }.bind(this))
             .catch(function (oError) {

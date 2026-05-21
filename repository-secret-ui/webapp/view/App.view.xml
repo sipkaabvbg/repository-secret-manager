@@ -47,7 +47,7 @@
                             <ColumnListItem>
                                 <cells>
                                     <ObjectIdentifier title="{name}" />
-                                    <Text text="{providerType}" /> 
+                                    <Text text="{provider}" /> 
                                     <Button icon="sap-icon://delete" type="Reject" press=".onDeleteSecret"/>
                                 </cells>
                             </ColumnListItem>
