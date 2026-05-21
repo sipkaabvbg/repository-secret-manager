@@ -2,6 +2,7 @@ package com.cicd.credentials.controller;
 
 import com.cicd.credentials.dto.CreateRepoResponse;
 import com.cicd.credentials.dto.RepoDetailsResponse;
+import com.cicd.credentials.dto.UpdateRepoRequest;
 import com.cicd.credentials.entity.ExternalRepoEntity;
 import com.cicd.credentials.service.ExternalRepoService;
 import org.springframework.http.HttpStatus;
@@ -72,5 +73,22 @@ public class ExternalRepoController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         externalRepoService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * REST endpoint to update an existing repository's details by its unique identifier.
+     * This handles HTTP PUT requests aimed at "/repositories/{id}".
+     *
+     * @param id      The unique ID of the repository to be updated, extracted directly from the URL path.
+     * @param request The data transfer object (DTO) containing the updated repository fields from the UI.
+     * @return A ResponseEntity containing the updated repository details and an HTTP 200 OK status.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<RepoDetailsResponse> updateRepository(
+            @PathVariable Long id,
+            @RequestBody UpdateRepoRequest request
+    ) {
+        RepoDetailsResponse updatedRepo = externalRepoService.update(id, request);
+        return ResponseEntity.ok(updatedRepo);
     }
 }

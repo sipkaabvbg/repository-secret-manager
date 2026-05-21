@@ -382,7 +382,7 @@ sap.ui.define([
             var oEditedRepo = oContext.getObject(); // Retrieve the updated data from the model
 
             // Request to your backend controller for the update (usually PUT or POST)
-            fetch("/api/repositories/" + oEditedRepo.id, {
+            fetch(this.reposUrl +"/"+ oEditedRepo.id, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"

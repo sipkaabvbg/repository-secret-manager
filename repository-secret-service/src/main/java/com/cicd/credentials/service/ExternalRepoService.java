@@ -1,11 +1,13 @@
 package com.cicd.credentials.service;
 
 import com.cicd.credentials.dto.RepoDetailsResponse;
+import com.cicd.credentials.dto.UpdateRepoRequest;
 import com.cicd.credentials.entity.ExternalRepoEntity;
 import com.cicd.credentials.entity.SecretEntity;
 import com.cicd.credentials.repository.ExternalRepoRepository;
 import com.cicd.credentials.repository.SecretRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -69,5 +71,40 @@ public class ExternalRepoService {
      */
     public void delete(Long id) {
         externalRepoRepository.deleteById(id);
+    }
+
+    /**
+     * Updates an existing repository configuration and its associated secret relationship.
+     * * @param id      The database ID of the repository to update.
+     * @param request The DTO containing the updated name, URL, and secret ID.
+     * @return The updated repository details mapped into a response DTO.
+     */
+    @Transactional
+    public RepoDetailsResponse update(Long id, UpdateRepoRequest request) {
+       ExternalRepoEntity repository = externalRepoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Repository not found with id: " + id));
+
+        repository.setName(request.name());
+        repository.setUrl(request.url());
+
+        String secretName = null;
+        if (request.secretId() != null) {
+            SecretEntity secret = secretRepository.findById(request.secretId() )
+                    .orElseThrow(() -> new RuntimeException("Secret not found with id: " + request.secretId()));
+            repository.setSecret(secret);
+            secretName = secret.getName();
+        } else {
+            repository.setSecret(null);
+        }
+        ExternalRepoEntity savedRepo = externalRepoRepository.save(repository);
+
+        return new RepoDetailsResponse(
+                savedRepo.getId(),
+                savedRepo.getName(),
+                savedRepo.getUrl(),
+                request.secretId(),
+                secretName,
+                false
+        );
     }
 }
