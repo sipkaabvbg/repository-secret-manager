@@ -6,35 +6,60 @@
             <items>
                 <!-- tab 1: SECRETS -->
                 <IconTabFilter icon="sap-icon://key" text="Secrets" key="secrets">
-                  <Panel headerText="Add New Secret" class="sapUiSmallMarginBottom">
-                                    <l:HorizontalLayout>
-                                        <Input id="inpSecretName" placeholder="Secret Name (Identifier)" width="250px" class="sapUiSmallMarginEnd"/>
-                                        <Input id="inpSecretValue" type="Password" placeholder="Token/Password" width="250px" class="sapUiSmallMarginEnd"/>
-                                        <Button text="Add Secret" type="Emphasized" icon="sap-icon://add" press=".onAddSecret"/>
-                                    </l:HorizontalLayout>
-                                </Panel>
-                                <Table items="{/secrets}" noDataText="No secrets found. Add your first secret.">
-                                    <columns>
-                                        <!--Column><Text text="ID" /></Column-->
-                                        <Column><Text text="Secret Name" /></Column>
-                                        <Column hAlign="End"><Text text="Actions" /></Column>
-                                    </columns>
-                                    <items>
-                                        <ColumnListItem>
-                                            <cells>
-                                                <!--Text text="{id}" /-->
-                                                <ObjectIdentifier title="{name}" />
-                                                <Button icon="sap-icon://delete" type="Reject" press=".onDeleteSecret"/>
-                                            </cells>
-                                        </ColumnListItem>
-                                    </items>
-                                </Table>
+                    <Panel headerText="Add New Secret" class="sapUiSmallMarginBottom">
+                        <VBox class="sapUiSmallMargin">
+                            
+                            <HBox class="sapUiSmallMarginBottom" alignItems="Center">
+                                <Input id="inpSecretName" placeholder="Secret Name (Identifier)" width="200px" class="sapUiSmallMarginEnd"/>
+                                
+                                <Select id="selProviderType" forceSelection="true" width="150px" class="sapUiSmallMarginEnd" change=".onProviderChange">
+                                    <core:Item key="OTHER" text="Other Provider" />
+                                    <core:Item key="GITHUB" text="GitHub" />
+                                </Select>
+                            </HBox>
+
+                            <HBox id="boxGithubType" class="sapUiSmallMarginBottom" alignItems="Center" visible="false">
+                                <Label text="GitHub Secret Type: " class="sapUiTinyMarginEnd" design="Bold"/>
+                                <Select id="selGithubType" forceSelection="true" width="200px" change=".onGithubTypeChange">
+                                    <core:Item key="PAT" text="Personal Access Token (PAT)" />
+                                    <core:Item key="SSH" text="SSH Private Key" />
+                                    <core:Item key="APP" text="GitHub App (PEM Key)" />
+                                </Select>
+                            </HBox>
+
+                            <VBox id="boxSecretValue" class="sapUiSmallMarginBottom">
+                                <Input id="inpSecretToken" type="Password" placeholder="Token/Password" width="400px"/>
+                                <TextArea id="inpSecretKey" placeholder="-----BEGIN PRIVATE KEY-----&#10;Paste multiline key here...&#10;-----END PRIVATE KEY-----" width="600px" rows="6" visible="false"/>
+                            </VBox>
+
+                            <Button text="Add Secret" type="Emphasized" icon="sap-icon://add" press=".onAddSecret"/>
+                            
+                        </VBox>
+                    </Panel>
+
+                    <Table items="{/secrets}" noDataText="No secrets found. Add your first secret.">
+                        <columns>
+                            <Column><Text text="Secret Name" /></Column>
+                            <Column><Text text="Provider" /></Column>
+                            <Column hAlign="End"><Text text="Actions" /></Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem>
+                                <cells>
+                                    <ObjectIdentifier title="{name}" />
+                                    <Text text="{provider}" /> 
+                                    <Button icon="sap-icon://delete" type="Reject" press=".onDeleteSecret"/>
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
                 </IconTabFilter>
                 
                 <!-- tab 2: REPOSITORIES -->
                 <IconTabFilter icon="sap-icon://source-code" text="Repositories" key="repos">
                    <Panel headerText="Add New Repository" class="sapUiMarginBottom">
                                     <l:HorizontalLayout>
+                                        <Input id="inpRepoName" placeholder="Repository Name" width="200px" class="sapUiSmallMarginEnd"/>
                                         <Input id="inpRepoUrl" placeholder="https://github.com/my/repo.git" width="300px" class="sapUiSmallMarginEnd"/>
                                        
                                         <Select id="selSecret" forceSelection="false" width="200px" class="sapUiSmallMarginEnd" items="{/dropdownSecrets}">
@@ -49,7 +74,7 @@
 
                                 <Table items="{/repos}" noDataText="No repositories linked yet. Use the form to add one.">
                                     <columns>
-                                        <!--Column><Text text="ID" /></Column-->
+                                        <Column><Text text="Name" /></Column>
                                         <Column><Text text="URL" /></Column>
                                         <Column><Text text="Linked Secret" /></Column>
                                         <Column hAlign="End"><Text text="Actions" /></Column>
@@ -57,6 +82,7 @@
                                     <items>
                                         <ColumnListItem>
                                     <cells>
+                                        <ObjectIdentifier title="{name}" />
                                         <Text text="{url}" />
                                         <Text text="{secretName}" />
                                         <HBox justifyContent="End">

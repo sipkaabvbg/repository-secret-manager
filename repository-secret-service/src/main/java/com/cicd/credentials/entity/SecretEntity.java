@@ -19,7 +19,6 @@ public class SecretEntity {
 
     /**
      * Human-readable secret name.
-     * Example: github-token
      */
     @Column(nullable = false)
     private String name;
@@ -30,9 +29,26 @@ public class SecretEntity {
     @Column(nullable = false)
     private String secretValue;
 
+    /**
+     * The provider for this secret.
+     */
+    @Column(nullable = false)
+    private String provider;
+
+    /**
+     * The authentication type.
+     */
+    @Column(nullable = false)
+    private String secretType;
+
     public SecretEntity() {
     }
-
+    public SecretEntity(String name, String secretValue, String provider, String secretType) {
+        this.name = name;
+        this.secretValue = secretValue;
+        this.provider = provider;
+        this.secretType = secretType;
+    }
     public Long getId() {
         return id;
     }
@@ -52,4 +68,12 @@ public class SecretEntity {
     public void setSecretValue(String secretValue) {
         this.secretValue = secretValue;
     }
+
+    public String getProvider() { return provider; }
+
+    public void setProvider(String provider) { this.provider = provider;}
+
+    public String getSecretType() {return secretType;}
+
+    public void setSecretType(String secretType) { this.secretType = secretType; }
 }
