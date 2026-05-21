@@ -43,7 +43,12 @@ public class SecretEntity {
 
     public SecretEntity() {
     }
-
+    public SecretEntity(String name, String secretValue, String provider, String secretType) {
+        this.name = name;
+        this.secretValue = secretValue;
+        this.provider = provider;
+        this.secretType = secretType;
+    }
     public Long getId() {
         return id;
     }

@@ -1,5 +1,7 @@
 package com.cicd.credentials.service;
 
+import com.cicd.credentials.dto.SecretCreateRequest;
+import com.cicd.credentials.dto.SecretCreatedResponse;
 import com.cicd.credentials.entity.SecretEntity;
 import com.cicd.credentials.repository.SecretRepository;
 import org.springframework.stereotype.Service;
@@ -25,11 +27,20 @@ public class SecretService {
     /**
      * Persists a new authentication secret in the database.
      *
-     * @param secret the secret entity containing the credentials data
+     * @param request the secret DTO containing the credentials data
      * @return the saved SecretEntity including its generated database ID
      */
-    public SecretEntity create(SecretEntity secret) {
-        return secretRepository.save(secret);
+    public SecretCreatedResponse create(SecretCreateRequest request) {
+        // 1. Map incoming DTO to Entity
+        SecretEntity secretEntity = new SecretEntity(
+                request.name(),
+                request.secretValue(),
+                request.provider(),
+                request.secretType()
+        );
+
+        SecretEntity savedSecret = secretRepository.save(secretEntity);
+        return new SecretCreatedResponse(savedSecret.getId());
     }
 
     /**

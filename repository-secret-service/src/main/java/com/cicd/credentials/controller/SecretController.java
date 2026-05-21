@@ -1,5 +1,7 @@
 package com.cicd.credentials.controller;
 
+import com.cicd.credentials.dto.SecretCreateRequest;
+import com.cicd.credentials.dto.SecretCreatedResponse;
 import com.cicd.credentials.entity.SecretEntity;
 import com.cicd.credentials.service.SecretService;
 import org.springframework.http.HttpStatus;
@@ -32,9 +34,11 @@ public class SecretController {
      * and 201 Created status on successful POST
      */
     @PostMapping
-    public ResponseEntity<SecretEntity> create(@RequestBody SecretEntity secret) {
-        SecretEntity savedSecret = secretService.create(secret);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedSecret);
+    public ResponseEntity< SecretCreatedResponse> create(@RequestBody SecretCreateRequest request) {
+        // Persist the entity via service
+        SecretEntity savedSecret = secretService.create(request);
+        SecretCreatedResponse response = new SecretCreatedResponse(savedSecret.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     /**
      * Endpoint to list all persisted secrets in the system.
