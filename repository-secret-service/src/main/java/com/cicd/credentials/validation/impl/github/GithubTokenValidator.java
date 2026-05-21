@@ -1,7 +1,9 @@
 package com.cicd.credentials.validation.impl.github;
 
 import com.cicd.credentials.dto.ValidationResponse;
+import com.cicd.credentials.validation.AuthMethod;
 import com.cicd.credentials.validation.CredentialValidator;
+import com.cicd.credentials.validation.Provider;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -13,6 +15,12 @@ import org.springframework.web.client.RestTemplate;
 public class GithubTokenValidator implements CredentialValidator {
 
     private final RestTemplate restTemplate = new RestTemplate();
+
+    @Override
+    public boolean supports(String provider, String authMethod) {
+        return Provider.GITHUB.name().equalsIgnoreCase(provider)
+                && AuthMethod.TOKEN.name().equalsIgnoreCase(authMethod);
+    }
 
     @Override
     public ValidationResponse validate(String repo, String credential) {
@@ -51,6 +59,9 @@ public class GithubTokenValidator implements CredentialValidator {
      */
     private String toGithubApi(String repoUrl) {
         String cleaned = repoUrl.replace("https://github.com/", "");
+        if (cleaned.endsWith(".git")) {
+            cleaned = cleaned.substring(0, cleaned.length() - 4);
+        }
         return "https://api.github.com/repos/" + cleaned;
     }
 }

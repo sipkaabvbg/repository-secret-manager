@@ -21,9 +21,8 @@
                             <HBox id="boxGithubType" class="sapUiSmallMarginBottom" alignItems="Center" visible="false">
                                 <Label text="GitHub Secret Type: " class="sapUiTinyMarginEnd" design="Bold"/>
                                 <Select id="selGithubType" forceSelection="true" width="200px" change=".onGithubTypeChange">
-                                    <core:Item key="PAT" text="Personal Access Token (PAT)" />
+                                    <core:Item key="TOKEN" text="Personal Access Token (PAT)" />
                                     <core:Item key="SSH" text="SSH Private Key" />
-                                    <core:Item key="APP" text="GitHub App (PEM Key)" />
                                 </Select>
                             </HBox>
 
