@@ -8,8 +8,18 @@
                 <IconTabFilter icon="sap-icon://key" text="Secrets" key="secrets">
                   <Panel headerText="Add New Secret" class="sapUiSmallMarginBottom">
                                     <l:HorizontalLayout>
-                                        <Input id="inpSecretName" placeholder="Secret Name (Identifier)" width="250px" class="sapUiSmallMarginEnd"/>
-                                        <Input id="inpSecretValue" type="Password" placeholder="Token/Password" width="250px" class="sapUiSmallMarginEnd"/>
+                                        <!-- Поле за Име -->
+                                        <Input id="inpSecretName" placeholder="Secret Name (Identifier)" width="200px" class="sapUiSmallMarginEnd"/>
+                                        
+                                        <!-- НОВО: Падащо меню за Провайдър -->
+                                        <Select id="selProviderType" forceSelection="true" width="150px" class="sapUiSmallMarginEnd">
+                                            <core:Item key="" text="Select a provider" />
+                                            <core:Item key="GITHUB" text="GitHub" />
+                                        </Select>
+
+                                        <!-- Поле за Парола/Токен -->
+                                        <Input id="inpSecretValue" type="Password" placeholder="Token/Password" width="200px" class="sapUiSmallMarginEnd"/>
+                                        
                                         <Button text="Add Secret" type="Emphasized" icon="sap-icon://add" press=".onAddSecret"/>
                                     </l:HorizontalLayout>
                                 </Panel>
@@ -17,6 +27,7 @@
                                     <columns>
                                         <!--Column><Text text="ID" /></Column-->
                                         <Column><Text text="Secret Name" /></Column>
+                                          <Column><Text text="Provider" /></Column>
                                         <Column hAlign="End"><Text text="Actions" /></Column>
                                     </columns>
                                     <items>
@@ -24,6 +35,7 @@
                                             <cells>
                                                 <!--Text text="{id}" /-->
                                                 <ObjectIdentifier title="{name}" />
+                                                 <Text text="{providerType}" /> 
                                                 <Button icon="sap-icon://delete" type="Reject" press=".onDeleteSecret"/>
                                             </cells>
                                         </ColumnListItem>

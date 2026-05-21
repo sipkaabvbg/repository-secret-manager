@@ -73,15 +73,16 @@ sap.ui.define([
         onAddSecret: function () {
             var sName = this.byId("inpSecretName").getValue().trim();
             var sValue = this.byId("inpSecretValue").getValue().trim();
-
+            var sProvider = this.byId("selProviderType").getSelectedKey();
             // Simple validation check for empty inputs
-            if (!sName || !sValue) {
+            if (!sName || !sValue|| !sProvider) {
                 MessageToast.show("Please fill both fields.");
                 return;
             }
 
             var oNewSecret = {
                 name: sName,
+                providerType: sProvider,
                 secretValue: sValue
             };
 
