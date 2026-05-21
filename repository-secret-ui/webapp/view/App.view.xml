@@ -6,49 +6,53 @@
             <items>
                 <!-- tab 1: SECRETS -->
                 <IconTabFilter icon="sap-icon://key" text="Secrets" key="secrets">
-                  <Panel headerText="Add New Secret" class="sapUiSmallMarginBottom">
-                                    <l:HorizontalLayout>
-                                        <!-- Поле за Име -->
-                                        <Input id="inpSecretName" placeholder="Secret Name (Identifier)" width="200px" class="sapUiSmallMarginEnd"/>
-                                        
-                                        <!-- НОВО: Падащо меню за Провайдър -->
-                                        <Select id="selProviderType" forceSelection="true" width="150px" class="sapUiSmallMarginEnd">
-                                            <core:Item key="" text="Select a provider" />
-                                            <core:Item key="GITHUB" text="GitHub" />
-                                        </Select>
+                    <Panel headerText="Add New Secret" class="sapUiSmallMarginBottom">
+                        <VBox class="sapUiSmallMargin">
+                            
+                            <HBox class="sapUiSmallMarginBottom" alignItems="Center">
+                                <Input id="inpSecretName" placeholder="Secret Name (Identifier)" width="200px" class="sapUiSmallMarginEnd"/>
+                                
+                                <Select id="selProviderType" forceSelection="true" width="150px" class="sapUiSmallMarginEnd" change=".onProviderChange">
+                                    <core:Item key="OTHER" text="Other Provider" />
+                                    <core:Item key="GITHUB" text="GitHub" />
+                                </Select>
+                            </HBox>
 
-                                        <!-- Поле за Парола/Токен -->
-                                        <Input id="inpSecretValue" type="Password" placeholder="Token/Password" width="200px" class="sapUiSmallMarginEnd"/>
-                                        
-                                        <Button text="Add Secret" type="Emphasized" icon="sap-icon://add" press=".onAddSecret"/>
-                                    </l:HorizontalLayout>
-                                </Panel>
-                                 <HBox id="boxGithubType" class="sapUiSmallMarginBottom" alignItems="Center" visible="false">
-            <Label text="GitHub Secret Type: " class="sapUiTinyMarginEnd" design="Bold"/>
-            <Select id="selGithubType" forceSelection="true" width="200px" change=".onGithubTypeChange">
-                <core:Item key="PAT" text="Personal Access Token (PAT)" />
-                <core:Item key="SSH" text="SSH Private Key" />
-                <core:Item key="APP" text="GitHub App (PEM Key)" />
-            </Select>
-        </HBox>
-                                <Table items="{/secrets}" noDataText="No secrets found. Add your first secret.">
-                                    <columns>
-                                        <!--Column><Text text="ID" /></Column-->
-                                        <Column><Text text="Secret Name" /></Column>
-                                          <Column><Text text="Provider" /></Column>
-                                        <Column hAlign="End"><Text text="Actions" /></Column>
-                                    </columns>
-                                    <items>
-                                        <ColumnListItem>
-                                            <cells>
-                                                <!--Text text="{id}" /-->
-                                                <ObjectIdentifier title="{name}" />
-                                                 <Text text="{providerType}" /> 
-                                                <Button icon="sap-icon://delete" type="Reject" press=".onDeleteSecret"/>
-                                            </cells>
-                                        </ColumnListItem>
-                                    </items>
-                                </Table>
+                            <HBox id="boxGithubType" class="sapUiSmallMarginBottom" alignItems="Center" visible="false">
+                                <Label text="GitHub Secret Type: " class="sapUiTinyMarginEnd" design="Bold"/>
+                                <Select id="selGithubType" forceSelection="true" width="200px" change=".onGithubTypeChange">
+                                    <core:Item key="PAT" text="Personal Access Token (PAT)" />
+                                    <core:Item key="SSH" text="SSH Private Key" />
+                                    <core:Item key="APP" text="GitHub App (PEM Key)" />
+                                </Select>
+                            </HBox>
+
+                            <VBox id="boxSecretValue" class="sapUiSmallMarginBottom">
+                                <Input id="inpSecretToken" type="Password" placeholder="Token/Password" width="400px"/>
+                                <TextArea id="inpSecretKey" placeholder="-----BEGIN PRIVATE KEY-----&#10;Paste multiline key here...&#10;-----END PRIVATE KEY-----" width="600px" rows="6" visible="false"/>
+                            </VBox>
+
+                            <Button text="Add Secret" type="Emphasized" icon="sap-icon://add" press=".onAddSecret"/>
+                            
+                        </VBox>
+                    </Panel>
+
+                    <Table items="{/secrets}" noDataText="No secrets found. Add your first secret.">
+                        <columns>
+                            <Column><Text text="Secret Name" /></Column>
+                            <Column><Text text="Provider" /></Column>
+                            <Column hAlign="End"><Text text="Actions" /></Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem>
+                                <cells>
+                                    <ObjectIdentifier title="{name}" />
+                                    <Text text="{providerType}" /> 
+                                    <Button icon="sap-icon://delete" type="Reject" press=".onDeleteSecret"/>
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
                 </IconTabFilter>
                 
                 <!-- tab 2: REPOSITORIES -->

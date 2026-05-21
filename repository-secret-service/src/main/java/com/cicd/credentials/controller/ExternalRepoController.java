@@ -57,7 +57,7 @@ public class ExternalRepoController {
                 secId = entity.getSecret().getId();
                 secName = entity.getSecret().getName();
             }
-            return new RepoDetailsResponse(entity.getId(), entity.getUrl(), secId, secName);
+            return new RepoDetailsResponse(entity.getId(), entity.getName(),entity.getUrl(), secId, secName);
         }).toList();
     }
 
