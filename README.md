@@ -24,16 +24,90 @@ This is implemented transparently via a JPA `AttributeConverter`. The applicatio
 
 In addition, standard sequential IDs have been replaced with **UUIDs** to prevent Insecure Direct Object Reference (IDOR) vulnerabilities.
 
-## Why only GitHub PAT (Tokens)?
-The system currently supports authentication via **Personal Access Tokens (PAT)**. Since GitHub deprecated basic password authentication for Git operations, PAT is the industry standard for API and HTTPS Git operations. 
-Implemented repository credential validation logic, supporting secure authentication via GitHub REST API and enabling future extensibility for SSH-based validation mechanisms.
+## Current Provider Support & Limitations
+Currently, the system exclusively supports **GitHub** integration.
+Authentication is implemented using **Personal Access Tokens (PAT)**, which are the standard mechanism for secure Git operations over HTTPS, replacing deprecated password-based authentication.
+Repository credential validation is implemented via the GitHub REST API, ensuring secure verification of access rights. The design is extensible and allows future support for SSH-based authentication and validation mechanisms.
 
-## Database Relations & Architecture
+# Architecture
+
+## Backend Architecture & Layered Design
+
+The backend is built following a strict **Layered Architecture (Three-Tier Architecture)** pattern.  While currently running as a decoupled backend component, the design follows cloud-native principles, making it fully ready to operate as an independent **Microservice** within a larger CI/CD ecosystem.
+
+The application logic is structured into four distinct, isolated layers:
+
+```text
+[ Client / UI (SAPUI5) ]
+           │
+           ▼
+[ 1. Presentation Layer ]  (REST Controllers — handles DTOs & HTTP Validation)
+           │
+           ▼
+[ 2. Service Layer ]       (Business Logic — coordinates transactions & Strategies)
+           │
+           ▼
+[ 3. Data Access Layer ]   (Spring Data JPA — abstracts DB queries)
+           │
+           ▼
+[ 4. Database Layer ]      (H2 In-Memory — stores encrypted data at rest)
+
+
+
+### Architectural Layers Explained
+
+1. **Presentation Layer (Controllers):**
+   * **Role:** Exposes the REST API endpoints to the SAPUI5 frontend and external consumers.
+
+2. **Service Layer (Business Logic):**
+   * **Role:** The core engine of the system where business rules are enforced.
+
+3. **Data Access Layer (Repositories):**
+   * **Role:** Manages communication with the database.
+
+4. **Database Layer (Data Store):**
+   * **Role:** Persistent (or in-memory) storage.
+  
+## Database Relations 
 - **Many-to-One (Repositories ➔ Secrets):** The system uses a `@ManyToOne` Hibernate relationship. This allows authentication credentials to be centralized and shared across different repository tracks.
 - **Optional Secret (Nullable Foreign Key):** If a repository is **Public**, the user can save it without choosing a credential from the dropdown menu. In this case, the frontend sends a `null` payload, and the database stores a `NULL` value in the `secret_id` column. The UI automatically displays these entries as `No Secret (Public)`.
 
+## Architectural Design Patterns
 
-## How to Run
+### Extensibility via Strategy Pattern
+To support seamless future expansion to other source code management providers (like GitLab or Bitbucket) and alternative authentication methods (like SSH Keys), the validation engine is decoupled using the **Strategy Design Pattern**.
+
+At the core of this architecture is the `CredentialValidator` interface:
+
+* **Dynamic Capability Discovery (`supports`):** Every validator implementation defines which provider (e.g., GitHub, GitLab) and which authentication method (e.g., TOKEN, SSH) it can handle by implementing the `supports(String provider, String authMethod)` method.
+* **Encapsulated Execution (`validate`):** The core business logic interacts strictly with the high-level `CredentialValidator` abstraction, completely unaware of the underlying API specifics or HTTP endpoints of the remote providers.
+
+#### How Spring Boot Resolves Strategies Automatically:
+The system leverages Spring’s dependency injection to inject a `List<CredentialValidator>` into the validation service. When a request arrives, the service dynamically detects and executes the correct validator at runtime:
+
+```java
+ublic ValidationResponse validate(
+         String repoUrl,
+         UUID credentialId) {
+     log.info("Starting validation logic for repository: {} using credential ID: {}", repoUrl, credentialId);
+     SecretEntity secret = secretRepository.findById(credentialId)
+             .orElseThrow(() -> new RuntimeException("Secret not found"));
+     // Find matching strategy at runtime
+     CredentialValidator validator = validators.stream()
+             .filter(v -> v.supports(
+                     secret.getProvider(),
+                     secret.getSecretType()
+             ))
+             .findFirst()
+             .orElseThrow(() ->
+                     new RuntimeException("No validator found")
+             );
+     // Delegate validation to selected strategy
+     return validator.validate(repoUrl, secret.getSecretValue());
+```
+This open-closed architecture guarantees that adding support for GitLab Token Validation or Bitbucket SSH Validation requires zero modifications to existing services—you simply drop in a new @Component implementing CredentialValidator.
+
+## Getting Started & Installation
 
 ## Prerequisites
 To run this project locally, you need to have the following installed:
@@ -42,7 +116,6 @@ To run this project locally, you need to have the following installed:
 - **Node.js** (v18 or higher) & **npm** (for the SAPUI5 frontend)
 - **Docker** (Docker and Docker Compose installed on your machine)
 
----
 
 ### Option 1: Using Docker (Recommended)
 You can run the entire stack (Frontend + Backend) using Docker Compose.
@@ -51,14 +124,16 @@ You can run the entire stack (Frontend + Backend) using Docker Compose.
    ```bash
    git clone https://github.com/sipkaabvbg/repository-secret-manager.git
    cd repository-secret-manager
+   ```
 Build and start the containers:
 
 Run the following command in the console to build and start the containers:
 
+
 docker-compose up --build
 
 - Access the application:
-Frontend (UI5): http://localhost:8080
+Frontend (UI5): http://localhost:8080/index.html
 Backend API: http://localhost:8081/api/v1/swagger-ui/index.html#/
 
 
@@ -99,10 +174,22 @@ npm start
 
 ## API Endpoints Summary
 
+### Repositories API
 - GET `/api/v1/repositories` - Fetch all repositories
 - POST `/api/v1/repositories` - Add a new repository
 - DELETE `/api/v1/repositories/{id}` - Delete a repository
+### Secrets API
 - GET `/api/v1/secrets` - Fetch all secrets
 - POST `/api/v1/secrets` - Add a new secret
 - DELETE `/api/v1/secrets/{id}` - Delete a secret
+### Validation API
 - POST `/api/v1/validate` - Validates the repository URL against the given Secret ID
+
+## Testing
+
+Currently, unit tests are implemented exclusively for some backend component to ensure the stability of the core business logic.To run the backend test suite, navigate to the backend directory and execute:
+
+```bash
+cd repository-secret-service
+./mvnw test
+```
