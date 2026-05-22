@@ -1,5 +1,6 @@
 package com.cicd.credentials.entity;
 
+import com.cicd.credentials.security.crypto.SecretEncryptionConverter;
 import jakarta.persistence.*;
 
 import java.util.UUID;
@@ -28,8 +29,8 @@ public class SecretEntity {
      * Encrypted secret value.
      */
     @Column(nullable = false)
+    @Convert(converter = SecretEncryptionConverter.class)
     private String secretValue;
-
     /**
      * The provider for this secret.
      */
