@@ -37,9 +37,9 @@
                     </Panel>
                 <Table items="{/secrets}" noDataText="No secrets found. Add your first secret.">
                     <columns>
-                        <Column><Text text="Secret Name" /></Column>
-                        <Column><Text text="Provider" /></Column>
-                        <Column><Text text="Secret Type" /></Column>
+                        <Column  width="120px"><Text text="Secret Name" /></Column>
+                        <Column  width="120px"><Text text="Provider" /></Column>
+                        <Column  width="120px"><Text text="Secret Type" /></Column>
                         <Column visible="{= ${editable} === true }"><Text text="Token/Password" /></Column>
                         <Column hAlign="End"><Text text="Actions" /></Column>
                     </columns>
@@ -48,12 +48,12 @@
                             <cells>
                                 <VBox>
                                     <ObjectIdentifier title="{name}" visible="{= !${editable} }" />
-                                    <Input value="{name}" visible="{editable}" width="150px" />
+                                    <Input value="{name}" visible="{editable}" width="120px" />
                                 </VBox>
 
                                 <VBox>
                                     <Text text="{provider}" visible="{= !${editable} }" />
-                                    <Select selectedKey="{provider}" visible="{editable}" width="150px">
+                                    <Select selectedKey="{provider}" visible="{editable}" width="120px">
                                         <items>
                                             <core:Item key="GITHUB" text="GitHub" />
                                             <core:Item key="GITLAB" text="GitLab" />
@@ -62,16 +62,9 @@
                                     </Select>
                                 </VBox>
 
-                                <!--VBox>
-                                    <Text text="{githubType}" visible="{= !${editable} }" />
-                                    <Select id="selGithubTypeUpdate" selectedKey="{githubType}" visible="{editable}" width="150px">
-                                        <core:Item key="TOKEN" text="Personal Access Token (PAT)" />
-                                        <core:Item key="SSH" text="SSH Private Key" />
-                                    </Select>
-                                </VBox-->
                                 <VBox>
                                     <Text text="{secretType}" visible="{= !${editable} }" />
-                                    <Select id="selGithubTypeUpdate" selectedKey="{secretType}" visible="{editable}" width="150px">
+                                    <Select id="selGithubTypeUpdate" selectedKey="{secretType}" visible="{editable}" width="120px">
                                         <core:Item key="TOKEN" text="Personal Access Token (PAT)" />
                                         <core:Item key="SSH" text="SSH Private Key" />
                                     </Select>
@@ -98,10 +91,10 @@
                 <IconTabFilter icon="sap-icon://source-code" text="Repositories" key="repos">
                    <Panel headerText="Add New Repository" class="sapUiMarginBottom">
                                     <l:HorizontalLayout>
-                                        <Input id="inpRepoName" placeholder="Repository Name" width="200px" class="sapUiSmallMarginEnd"/>
-                                        <Input id="inpRepoUrl" placeholder="https://github.com/my/repo.git" width="300px" class="sapUiSmallMarginEnd"/>
+                                        <Input id="inpRepoName" placeholder="Repository Name" width="150px" class="sapUiSmallMarginEnd"/>
+                                        <Input id="inpRepoUrl" placeholder="https://github.com/my/repo.git" width="150px" class="sapUiSmallMarginEnd"/>
                                        
-                                        <Select id="selSecret" forceSelection="false" width="200px" class="sapUiSmallMarginEnd" items="{/dropdownSecrets}">
+                                        <Select id="selSecret" forceSelection="false" width="150px" class="sapUiSmallMarginEnd" items="{/dropdownSecrets}">
                                             <items>
                                                 <core:Item key="{id}" text="{name}" />
                                             </items>
