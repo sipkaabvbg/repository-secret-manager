@@ -2,6 +2,8 @@ package com.cicd.credentials.entity;
 
 import jakarta.persistence.*;
 
+import java.util.UUID;
+
 /**
  * Represents a source code repository managed by the CI/CD subsystem.
  * Stores the repository URL and the related authentication secret.
@@ -14,8 +16,8 @@ public class ExternalRepoEntity {
      * Unique identifier of the repository.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     /**
      * Human-readable repository name.
@@ -40,7 +42,7 @@ public class ExternalRepoEntity {
     public ExternalRepoEntity() {
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 

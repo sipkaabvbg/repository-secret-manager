@@ -1,3 +1,5 @@
 package com.cicd.credentials.dto;
 
-public record CreateRepoResponse(Long id) {}
+import java.util.UUID;
+
+public record CreateRepoResponse(UUID id) {}

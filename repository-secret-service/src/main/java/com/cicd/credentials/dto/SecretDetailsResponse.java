@@ -1,6 +1,8 @@
 package com.cicd.credentials.dto;
 
-public record SecretDetailsResponse(Long id,
+import java.util.UUID;
+
+public record SecretDetailsResponse(UUID id,
                                     String name,
                                     String provider,
                                     boolean editable) {
