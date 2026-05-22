@@ -2,6 +2,8 @@ package com.cicd.credentials.entity;
 
 import jakarta.persistence.*;
 
+import java.util.UUID;
+
 /**
  * Represents an authentication secret used for accessing repositories.
  * The secret value should be stored encrypted.
@@ -14,9 +16,8 @@ public class SecretEntity {
      * Unique identifier of the secret.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
     /**
      * Human-readable secret name.
      */
@@ -49,7 +50,7 @@ public class SecretEntity {
         this.provider = provider;
         this.secretType = secretType;
     }
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 

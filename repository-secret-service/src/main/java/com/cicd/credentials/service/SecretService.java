@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Service class handling the business logic for managing authentication secrets
@@ -61,7 +62,7 @@ public class SecretService {
      * @throws IllegalStateException if the secret is in use by a repository
      */
     @Transactional
-    public void delete(Long id) {
+    public void delete(UUID id) {
         if (!secretRepository.existsById(id)) {
             throw new RuntimeException("Secret not found with id: " + id);
         }
@@ -80,7 +81,7 @@ public class SecretService {
      * @throws RuntimeException if no secret is found with the given ID.
      */
     @Transactional
-    public SecretCreatedResponse update(Long id, SecretCreateRequest request) {
+    public SecretCreatedResponse update(UUID id, SecretCreateRequest request) {
         SecretEntity secret = secretRepository.findById(id )
                 .orElseThrow(() -> new RuntimeException("Repository not found with id: " + id));
 

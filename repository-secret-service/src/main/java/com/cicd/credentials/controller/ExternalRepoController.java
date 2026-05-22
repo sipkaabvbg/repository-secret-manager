@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * REST Controller providing web service endpoints for managing external source
@@ -52,7 +53,7 @@ public class ExternalRepoController {
         List<ExternalRepoEntity> entities = externalRepoService.findAll();
 
         return entities.stream().map(entity -> {
-            Long secId = null;
+            UUID secId = null;
             String secName = null;
             if (entity.getSecret() != null) {
                 secId = entity.getSecret().getId();
@@ -70,7 +71,7 @@ public class ExternalRepoController {
      * @return ResponseEntity with HTTP 204 No Content status on successful deletion
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
         externalRepoService.delete(id);
         return ResponseEntity.noContent().build();
     }
@@ -85,7 +86,7 @@ public class ExternalRepoController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<RepoDetailsResponse> updateRepository(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestBody UpdateRepoRequest request
     ) {
         RepoDetailsResponse updatedRepo = externalRepoService.update(id, request);

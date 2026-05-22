@@ -5,13 +5,15 @@ import com.cicd.credentials.entity.ExternalRepoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.UUID;
+
 /**
  * Repository interface for managing {@link ExternalRepoEntity} entities.
  * Provides standard CRUD operations and database interaction capabilities thanks to Spring Data JPA.
  */
 @Repository
-public interface ExternalRepoRepository extends JpaRepository<ExternalRepoEntity, Long> {
+public interface ExternalRepoRepository extends JpaRepository<ExternalRepoEntity, UUID> {
 
     // Checks if at least one record associated with this Secret ID exists
-    boolean existsBySecretId(Long secretId);
+    boolean existsBySecretId(UUID secretId);
 }

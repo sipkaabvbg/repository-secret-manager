@@ -1,12 +1,14 @@
 package com.cicd.credentials.dto;
 
-public record RepoDetailsResponse(Long id,
+import java.util.UUID;
+
+public record RepoDetailsResponse(UUID id,
                                   String name,
                                   String url,
-                                  Long secretId,
+                                  UUID secretId,
                                   String secretName,
                                   boolean editable) {
-    public RepoDetailsResponse(Long id, String name, String url, Long secretId, String secretName) {
+    public RepoDetailsResponse(UUID id, String name, String url, UUID secretId, String secretName) {
         this(id, name, url, secretId, secretName, false);
     }
 }

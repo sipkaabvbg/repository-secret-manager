@@ -7,6 +7,7 @@ import com.cicd.credentials.validation.CredentialValidator;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ValidationService {
@@ -25,7 +26,7 @@ public class ValidationService {
 
  public ValidationResponse validate(
          String repoUrl,
-         Long credentialId) {
+         UUID credentialId) {
      SecretEntity secret = secretRepository.findById(credentialId)
              .orElseThrow(() -> new RuntimeException("Secret not found"));
      // Find matching strategy at runtime

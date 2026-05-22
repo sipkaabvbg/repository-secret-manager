@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
@@ -43,7 +44,7 @@ public class ExternalRepoService {
      * @return the saved ExternalRepoEntity
      * @throws RuntimeException if the secret with the given ID does not exist
      */
-    public ExternalRepoEntity create(String name,String url, Long secretId) {
+    public ExternalRepoEntity create(String name,String url, UUID secretId) {
         ExternalRepoEntity repo = new ExternalRepoEntity();
         repo.setUrl(url);
         repo.setName(name);
@@ -69,7 +70,7 @@ public class ExternalRepoService {
      *
      * @param id the unique identifier of the repository to be deleted
      */
-    public void delete(Long id) {
+    public void delete(UUID id) {
         externalRepoRepository.deleteById(id);
     }
 
@@ -80,7 +81,7 @@ public class ExternalRepoService {
      * @return The updated repository details mapped into a response DTO.
      */
     @Transactional
-    public RepoDetailsResponse update(Long id, UpdateRepoRequest request) {
+    public RepoDetailsResponse update(UUID id, UpdateRepoRequest request) {
        ExternalRepoEntity repository = externalRepoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Repository not found with id: " + id));
 

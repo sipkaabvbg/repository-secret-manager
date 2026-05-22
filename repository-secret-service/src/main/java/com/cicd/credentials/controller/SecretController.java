@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * REST Controller for managing authentication secrets.
@@ -48,6 +49,7 @@ public class SecretController {
                         entity.getId(),
                         entity.getName(),
                         entity.getProvider(),
+                        entity.getSecretType(),
                         false // Forces 'editable' to be false initially so SAPUI5 renders read-only texts
                 ))
                 .toList();
@@ -59,7 +61,7 @@ public class SecretController {
      * @return  ResponseEntity with HTTP 204 No Content status on successful deletion
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id) {
+    public ResponseEntity<String> delete(@PathVariable UUID id) {
         try {
             secretService.delete(id);
             return ResponseEntity.noContent().build();
@@ -81,7 +83,7 @@ public class SecretController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<SecretCreatedResponse> updateSecret(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestBody SecretCreateRequest request
     ) {
         SecretCreatedResponse updatedRepo =  secretService.update(id, request);

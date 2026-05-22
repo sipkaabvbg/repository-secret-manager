@@ -1,4 +1,6 @@
 package com.cicd.credentials.dto;
 
-public record ValidationRequest(String repoUrl, Long secretId) {
+import java.util.UUID;
+
+public record ValidationRequest(String repoUrl, UUID secretId) {
 }
