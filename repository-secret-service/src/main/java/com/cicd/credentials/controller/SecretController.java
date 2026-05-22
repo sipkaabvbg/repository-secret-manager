@@ -49,6 +49,7 @@ public class SecretController {
                         entity.getId(),
                         entity.getName(),
                         entity.getProvider(),
+                        entity.getSecretType(),
                         false // Forces 'editable' to be false initially so SAPUI5 renders read-only texts
                 ))
                 .toList();

@@ -213,7 +213,7 @@ sap.ui.define([
             var oPayload = {
                 name: sName,
                 url: sUrl,
-                secretId: sSecretId ? parseInt(sSecretId) : null
+                secretId: sSecretId ? sSecretId : null
             };
 
             fetch(this.reposUrl, {
@@ -405,19 +405,18 @@ sap.ui.define([
                     secretId: oEditedRepo.secretId // Send the new secret ID if it was changed
                 })
             })
-            .then(function (response) {
+            .then((response) => {
                 if (response.ok) {
                     sap.m.MessageToast.show("Repository updated successfully!");
                     
-                    // Important: You can either reload the entire list from the backend here or manually update the secretName on screen
-                    
                     // Lock the row back into read-only mode
                     oModel.setProperty(sPath + "/editable", false);
+                    this._loadRepos();
                 } else {
                     sap.m.MessageToast.show("Failed to update repository.");
-                }
+                      }
             })
-            .catch(function (error) {
+            .catch((error) => {
                 sap.m.MessageToast.show("Error connecting to server: " + error);
             });
         },
