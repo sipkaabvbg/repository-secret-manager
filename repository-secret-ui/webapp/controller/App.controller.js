@@ -457,7 +457,6 @@ sap.ui.define([
 
             // 3. Extract Secret Type value from Cell [2]
             var oTypeVBox = aCells[2];
-            // Find the Select control inside this VBox container
             var oTypeSelect = oTypeVBox.getItems().find(function(oItem) {
                 return oItem.getMetadata().getName() === "sap.m.Select";
             });
@@ -465,7 +464,6 @@ sap.ui.define([
 
             // 4. Extract Token/Password value from Cell [3]
             var oTokenVBox = aCells[3];
-            // Find the Input control inside this VBox container
             var oTokenInput = oTokenVBox.getItems().find(function(oItem) {
                 return oItem.getMetadata().getName() === "sap.m.Input";
             });
@@ -487,13 +485,15 @@ sap.ui.define([
             .then(function (response) {
                 if (response.ok) {
                     sap.m.MessageToast.show("Secret updated successfully!");
-                    
+                    oModel.setProperty(sPath + "/secretType", sSecretType);
+                    oModel.setProperty(sPath + "/secretValue", sNewPassword);
+
                     // Clear the password input field after a successful save operation for security
                     if (oTokenInput) {
                         oTokenInput.setValue("");
                     }
 
-                    // Lock the table row back into read-only mode
+                    // Lock the table row back into read-only mode (fields switch back to <Text>)
                     oModel.setProperty(sPath + "/editable", false);
                 } else {
                     sap.m.MessageToast.show("Failed to update secret.");
