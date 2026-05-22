@@ -1,7 +1,6 @@
 package com.cicd.credentials.controller;
 
-import com.cicd.credentials.dto.SecretCreateRequest;
-import com.cicd.credentials.dto.SecretCreatedResponse;
+import com.cicd.credentials.dto.*;
 import com.cicd.credentials.entity.SecretEntity;
 import com.cicd.credentials.service.SecretService;
 import org.springframework.http.HttpStatus;
@@ -42,8 +41,16 @@ public class SecretController {
      * * @return A list of all stored secrets.
      */
     @GetMapping
-    public List<SecretEntity> getAll() {
-        return secretService.findAll();
+    public List<SecretDetailsResponse> getAll() {
+        List<SecretEntity> secretEntities = secretService.findAll();
+        return secretEntities.stream()
+                .map(entity -> new SecretDetailsResponse(
+                        entity.getId(),
+                        entity.getName(),
+                        entity.getProvider(),
+                        false // Forces 'editable' to be false initially so SAPUI5 renders read-only texts
+                ))
+                .toList();
     }
 
     /**
@@ -55,5 +62,23 @@ public class SecretController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         secretService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Updates an existing secret repository by its unique identifier.
+     * Receives the updated configuration fields (name, provider, secretType, secretValue)
+     * from the frontend client via HTTP PUT payload.
+     *
+     * @param id      The database ID of the secret to be updated.
+     * @param request The data transfer object (DTO) containing updated secret specifications.
+     * @return ResponseEntity containing the updated secret details and HTTP 200 OK status.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<SecretCreatedResponse> updateSecret(
+            @PathVariable Long id,
+            @RequestBody SecretCreateRequest request
+    ) {
+        SecretCreatedResponse updatedRepo =  secretService.update(id, request);
+        return ResponseEntity.ok(updatedRepo);
     }
 }

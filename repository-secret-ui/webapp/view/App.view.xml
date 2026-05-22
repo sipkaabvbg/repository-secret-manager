@@ -35,23 +35,63 @@
                             
                         </VBox>
                     </Panel>
+                <Table items="{/secrets}" noDataText="No secrets found. Add your first secret.">
+                    <columns>
+                        <Column><Text text="Secret Name" /></Column>
+                        <Column><Text text="Provider" /></Column>
+                        <Column><Text text="Secret Type" /></Column>
+                        <Column visible="{= ${editable} === true }"><Text text="Token/Password" /></Column>
+                        <Column hAlign="End"><Text text="Actions" /></Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <VBox>
+                                    <ObjectIdentifier title="{name}" visible="{= !${editable} }" />
+                                    <Input value="{name}" visible="{editable}" width="150px" />
+                                </VBox>
 
-                    <Table items="{/secrets}" noDataText="No secrets found. Add your first secret.">
-                        <columns>
-                            <Column><Text text="Secret Name" /></Column>
-                            <Column><Text text="Provider" /></Column>
-                            <Column hAlign="End"><Text text="Actions" /></Column>
-                        </columns>
-                        <items>
-                            <ColumnListItem>
-                                <cells>
-                                    <ObjectIdentifier title="{name}" />
-                                    <Text text="{provider}" /> 
-                                    <Button icon="sap-icon://delete" type="Reject" press=".onDeleteSecret"/>
-                                </cells>
-                            </ColumnListItem>
-                        </items>
-                    </Table>
+                                <VBox>
+                                    <Text text="{provider}" visible="{= !${editable} }" />
+                                    <Select selectedKey="{provider}" visible="{editable}" width="150px">
+                                        <items>
+                                            <core:Item key="GITHUB" text="GitHub" />
+                                            <core:Item key="GITLAB" text="GitLab" />
+                                            <core:Item key="OTHER" text="Other Provider" />
+                                        </items>
+                                    </Select>
+                                </VBox>
+
+                                <!--VBox>
+                                    <Text text="{githubType}" visible="{= !${editable} }" />
+                                    <Select id="selGithubTypeUpdate" selectedKey="{githubType}" visible="{editable}" width="150px">
+                                        <core:Item key="TOKEN" text="Personal Access Token (PAT)" />
+                                        <core:Item key="SSH" text="SSH Private Key" />
+                                    </Select>
+                                </VBox-->
+                                <VBox>
+                                    <Text text="{secretType}" visible="{= !${editable} }" />
+                                    <Select id="selGithubTypeUpdate" selectedKey="{secretType}" visible="{editable}" width="150px">
+                                        <core:Item key="TOKEN" text="Personal Access Token (PAT)" />
+                                        <core:Item key="SSH" text="SSH Private Key" />
+                                    </Select>
+                                </VBox>
+
+                                <VBox visible="{editable}">
+                                    <Input id="inpSecretTokenUpdate" type="Password" placeholder="Token/Password" width="120px"/>
+                                </VBox>
+
+                                <HBox justifyContent="End">
+                                    <Button icon="sap-icon://edit" type="Attention" press=".onEditSecret" visible="{= !${editable} }" class="sapUiTinyMarginEnd" />
+                                    <Button icon="sap-icon://delete" type="Reject" press=".onDeleteSecret" visible="{= !${editable} }" />
+                                                                                                                                
+                                    <Button icon="sap-icon://save" text="Save" type="Accept" press=".onSaveSecret" visible="{editable}" class="sapUiTinyMarginEnd" />
+                                    <Button icon="sap-icon://sys-cancel" text="Cancel" press=".onCancelEditSecret" visible="{editable}" />
+                                </HBox>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
                 </IconTabFilter>
                 
                 <!-- tab 2: REPOSITORIES -->

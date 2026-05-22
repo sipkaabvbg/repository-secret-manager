@@ -44,7 +44,20 @@ sap.ui.define([
                 .then(function (aData) {
                     var aRawSecrets = (aData && Array.isArray(aData)) ? aData : [];
 
-				   // 1. Path for the Secrets tab table (contains only DB records)
+                    aRawSecrets.forEach(function (oSecret) {
+                        if (oSecret.editable === undefined) {
+                            oSecret.editable = false; 
+                        }
+                        if (oSecret.githubType && !oSecret.secretType) {
+                            oSecret.secretType = oSecret.githubType;
+                        }
+
+                        if (!oSecret.secretType) {
+                            oSecret.secretType = "TOKEN"; 
+                        }
+                    });
+
+                    // 1. Path for the Secrets tab table (contains only DB records)
                     oModel.setProperty("/secrets", aRawSecrets);
 
                     // 2. Separate deep copy path specifically for the Repo creation dropdown select control
@@ -53,7 +66,8 @@ sap.ui.define([
                     // Prepend the Public option exclusively to the dropdown data set
                     aDropdownData.unshift({
                         id: "",
-                        name: "-- Public (No Secret) --"
+                        name: "-- Public (No Secret) --",
+                        secretType: "TOKEN"
                     });
 
                     // Update the isolated dropdown model path
@@ -62,10 +76,10 @@ sap.ui.define([
                 }.bind(this))
                 .catch(function (oError) {
                     oModel.setProperty("/secrets", []);
-                    oModel.setProperty("/dropdownSecrets", [{ id: "", name: "-- Public (No Secret) --" }]);
-                    MessageToast.show("Error loading secrets: " + oError.message);
+                    oModel.setProperty("/dropdownSecrets", [{ id: "", name: "-- Public (No Secret) --", secretType: "TOKEN" }]);
+                    sap.m.MessageToast.show("Error loading secrets: " + oError.message);
                 });
-        },
+            },
         /*
          * Sends a new secret object payload to the backend
          */
@@ -407,6 +421,94 @@ sap.ui.define([
             })
             .catch(function (error) {
                 sap.m.MessageToast.show("Error connecting to server: " + error);
+            });
+        },
+        //SECRET
+        // 1. Triggered when clicking the Edit button (the pencil icon)
+        onEditSecret: function (oEvent) {
+            var oContext = oEvent.getSource().getBindingContext();
+            
+            // Create a backup copy of current data in case the user cancels the action
+            this._oOriginalSecretData = Object.assign({}, oContext.getObject());
+            
+            // Activate edit mode only for this specific row
+            oContext.getModel().setProperty(oContext.getPath() + "/editable", true);
+        },
+
+        // 2. Triggered when clicking the Cancel button
+        onCancelEditSecret: function (oEvent) {
+            var oContext = oEvent.getSource().getBindingContext();
+            var oModel = oContext.getModel();
+            var sPath = oContext.getPath();
+
+            // Restore the original values from before the edit session started
+            oModel.setProperty(sPath + "/name", this._oOriginalSecretData.name);
+            oModel.setProperty(sPath + "/provider", this._oOriginalSecretData.provider);
+            
+            // Lock the row back into read-only mode
+            oModel.setProperty(sPath + "/editable", false);
+        },
+
+        // 3. Triggered when clicking the Save button (the diskette icon)
+        onSaveSecret: function (oEvent) {
+            var oButton = oEvent.getSource(); // The specific save button that was clicked
+            var oContext = oButton.getBindingContext();
+            var oModel = oContext.getModel();
+            var sPath = oContext.getPath();
+            var oEditedSecret = oContext.getObject(); // Current row data from the model
+
+            // 1. Get the reference to the row container (ColumnListItem) directly from the button
+            var oRow = oButton.getParent().getParent(); 
+
+            // 2. Get all cells array from the current row
+            var aCells = oRow.getCells();
+
+            // 3. Extract Secret Type value from Cell [2]
+            var oTypeVBox = aCells[2];
+            var oTypeSelect = oTypeVBox.getItems().find(function(oItem) {
+                return oItem.getMetadata().getName() === "sap.m.Select";
+            });
+            var sSecretType = oTypeSelect ? oTypeSelect.getSelectedKey() : "";
+
+            // 4. Extract Token/Password value from Cell [3]
+            var oTokenVBox = aCells[3];
+            var oTokenInput = oTokenVBox.getItems().find(function(oItem) {
+                return oItem.getMetadata().getName() === "sap.m.Input";
+            });
+            var sNewPassword = oTokenInput ? oTokenInput.getValue() : "";
+
+            // Send HTTP PUT request to sync the updated secret data back to the Spring Boot backend
+            fetch(this.secretsUrl + "/" + oEditedSecret.id, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: oEditedSecret.name,
+                    provider: oEditedSecret.provider,
+                    secretType: sSecretType,   // Payload property matching your backend field
+                    secretValue: sNewPassword  // Injecting the newly grabbed token/password string
+                })
+            })
+            .then(function (response) {
+                if (response.ok) {
+                    sap.m.MessageToast.show("Secret updated successfully!");
+                    oModel.setProperty(sPath + "/secretType", sSecretType);
+                    oModel.setProperty(sPath + "/secretValue", sNewPassword);
+
+                    // Clear the password input field after a successful save operation for security
+                    if (oTokenInput) {
+                        oTokenInput.setValue("");
+                    }
+
+                    // Lock the table row back into read-only mode (fields switch back to <Text>)
+                    oModel.setProperty(sPath + "/editable", false);
+                } else {
+                    sap.m.MessageToast.show("Failed to update secret.");
+                }
+            })
+            .catch(function (error) {
+                sap.m.MessageToast.show("Network error: " + error);
             });
         },
     });
