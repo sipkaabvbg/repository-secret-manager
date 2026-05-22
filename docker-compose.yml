@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./repository-secret-service
+    ports:
+      - "8081:8081"
+    networks:
+      - cicd-network
+
+networks:
+  cicd-network:
+    driver: bridge
