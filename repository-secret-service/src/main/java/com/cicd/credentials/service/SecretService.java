@@ -3,6 +3,7 @@ package com.cicd.credentials.service;
 import com.cicd.credentials.dto.*;
 import com.cicd.credentials.entity.ExternalRepoEntity;
 import com.cicd.credentials.entity.SecretEntity;
+import com.cicd.credentials.repository.ExternalRepoRepository;
 import com.cicd.credentials.repository.SecretRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,13 +17,15 @@ import java.util.List;
 public class SecretService {
 
     private final SecretRepository secretRepository;
+    private final ExternalRepoRepository externalRepoRepository;
 
     /**
      * Constructor injection for the required database repository.
      * @param secretRepository the repository for CRUD operations on SecretEntity
      */
-    public SecretService(SecretRepository secretRepository) {
+    public SecretService(SecretRepository secretRepository, ExternalRepoRepository externalRepoRepository) {
         this.secretRepository = secretRepository;
+        this.externalRepoRepository = externalRepoRepository;
     }
 
     /**
@@ -53,9 +56,19 @@ public class SecretService {
 
     /**
      * Deletes an authentication secret by its unique identifier.
-     * @param id the unique identifier of the secret to be deleted
+     * Throws an exception if the secret is currently linked to any repository.
+     * * @param id the unique identifier of the secret to be deleted
+     * @throws IllegalStateException if the secret is in use by a repository
      */
+    @Transactional
     public void delete(Long id) {
+        if (!secretRepository.existsById(id)) {
+            throw new RuntimeException("Secret not found with id: " + id);
+        }
+        boolean isSecretInUse = externalRepoRepository.existsBySecretId(id);
+        if (isSecretInUse) {
+            throw new IllegalStateException("Cannot delete this secret because it is linked to repository.");
+        }
         secretRepository.deleteById(id);
     }
 

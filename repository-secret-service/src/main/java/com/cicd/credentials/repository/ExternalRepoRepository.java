@@ -11,4 +11,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ExternalRepoRepository extends JpaRepository<ExternalRepoEntity, Long> {
+
+    // Checks if at least one record associated with this Secret ID exists
+    boolean existsBySecretId(Long secretId);
 }
