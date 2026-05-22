@@ -1,5 +1,7 @@
 package com.cicd.credentials.validation.impl.github;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.cicd.credentials.dto.ValidationResponse;
 import com.cicd.credentials.validation.AuthMethod;
 import com.cicd.credentials.validation.CredentialValidator;
@@ -13,6 +15,8 @@ import java.io.FileWriter;
 @Component
 public class GithubSshValidator implements CredentialValidator {
 
+    private static final Logger log = LoggerFactory.getLogger(GithubSshValidator.class);
+
     @Override
     public boolean supports(String provider, String authMethod) {
         return Provider.GITHUB.name().equalsIgnoreCase(provider)
@@ -21,7 +25,7 @@ public class GithubSshValidator implements CredentialValidator {
 
     @Override
     public ValidationResponse validate(String repo, String privateKey) {
-
+        log.info("Starting validation for GitHub repository: {}", repo);
         File keyFile = null;
         try {
             keyFile = File.createTempFile("github-key", ".pem");

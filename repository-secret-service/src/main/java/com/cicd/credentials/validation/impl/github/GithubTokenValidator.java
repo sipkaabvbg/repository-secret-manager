@@ -1,5 +1,7 @@
 package com.cicd.credentials.validation.impl.github;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.cicd.credentials.dto.ValidationResponse;
 import com.cicd.credentials.validation.AuthMethod;
 import com.cicd.credentials.validation.CredentialValidator;
@@ -14,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class GithubTokenValidator implements CredentialValidator {
 
+    private static final Logger log = LoggerFactory.getLogger(GithubTokenValidator.class);
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Override
@@ -24,7 +27,7 @@ public class GithubTokenValidator implements CredentialValidator {
 
     @Override
     public ValidationResponse validate(String repo, String credential) {
-
+        log.info("Starting validation for GitHub repository: {}", repo);
         try {
             HttpHeaders headers = new HttpHeaders();
 
@@ -32,7 +35,7 @@ public class GithubTokenValidator implements CredentialValidator {
             HttpEntity<Void> entity = new HttpEntity<>(headers);
 
             String url = toGithubApi(repo);
-
+            log.debug("Calling GitHub API at URL: {}", url);
             ResponseEntity<String> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
@@ -41,9 +44,10 @@ public class GithubTokenValidator implements CredentialValidator {
             );
 
             if (response.getStatusCode().is2xxSuccessful()) {
+                log.info("Successfully validated access to repository: {}", repo);
                 return new ValidationResponse(true, "Token is valid");
             }
-
+            log.warn("Validation failed for repository {}. GitHub returned status: {}", repo, response.getStatusCode());
             return new ValidationResponse(false, "Invalid token");
 
         } catch (Exception e) {

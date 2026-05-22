@@ -1,5 +1,8 @@
 package com.cicd.credentials.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.cicd.credentials.dto.CreateRepoIdResponse;
 import com.cicd.credentials.dto.RepoDetailsResponse;
 import com.cicd.credentials.dto.UpdateRepoRequest;
 import com.cicd.credentials.entity.ExternalRepoEntity;
@@ -21,6 +24,7 @@ import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 @Service
 public class ExternalRepoService {
 
+    private static final Logger log = LoggerFactory.getLogger(ExternalRepoService.class);
     private final ExternalRepoRepository externalRepoRepository;
     private final SecretRepository secretRepository;
 
@@ -44,7 +48,7 @@ public class ExternalRepoService {
      * @return the saved ExternalRepoEntity
      * @throws RuntimeException if the secret with the given ID does not exist
      */
-    public ExternalRepoEntity create(String name,String url, UUID secretId) {
+    public CreateRepoIdResponse create(String name, String url, UUID secretId) {
         ExternalRepoEntity repo = new ExternalRepoEntity();
         repo.setUrl(url);
         repo.setName(name);
@@ -55,23 +59,40 @@ public class ExternalRepoService {
         } else {
             repo.setSecret(null);
         }
-        return externalRepoRepository.save(repo);
+        repo =externalRepoRepository.save(repo);
+        return new CreateRepoIdResponse(repo.getId());
     }
 
     /**
      * Retrieves a list of all External Repositories from the database.
-     * @return A list of all entities of type ExternalRepoEntity.
+     * @return A list of all entities of type RepoDetailsResponse
      */
-    public List<ExternalRepoEntity> findAll() {
-        return externalRepoRepository.findAll();
+    public List<RepoDetailsResponse> findAllDto() {
+        List<ExternalRepoEntity> entities = externalRepoRepository.findAll();
+        return entities.stream().map(entity -> {
+            UUID  secId = null;
+            String secName = null;
+            if (entity.getSecret() != null) {
+                secId = entity.getSecret().getId();
+                secName = entity.getSecret().getName();
+            }
+            return new RepoDetailsResponse(entity.getId(), entity.getName(), entity.getUrl(), secId, secName);
+        }).toList();
     }
+
     /**
      * Deletes a repository by its unique identifier.
      *
      * @param id the unique identifier of the repository to be deleted
      */
     public void delete(UUID id) {
+        log.debug("Attempting to find repository with ID: {} before deletion", id);
+        if (!externalRepoRepository.existsById(id)) {
+            log.warn("Cannot delete repository. ID {} not found in database.", id);
+            throw new RuntimeException("Repository not found");
+        }
         externalRepoRepository.deleteById(id);
+        log.info("Deleted repository entity from database (ID: {})", id);
     }
 
     /**

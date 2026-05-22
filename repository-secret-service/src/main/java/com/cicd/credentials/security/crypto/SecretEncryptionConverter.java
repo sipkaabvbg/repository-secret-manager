@@ -1,5 +1,7 @@
 package com.cicd.credentials.security.crypto;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import javax.crypto.Cipher;
@@ -15,6 +17,7 @@ import java.util.Base64;
 @Converter
 public class SecretEncryptionConverter implements AttributeConverter<String, String> {
 
+    private static final Logger log = LoggerFactory.getLogger(SecretEncryptionConverter.class);
     private static final String ALGORITHM = "AES";
 
     // IMPORTANT: For demo purposes only - hardcoded key is NOT secure for production use.
@@ -40,10 +43,12 @@ public class SecretEncryptionConverter implements AttributeConverter<String, Str
         if (plainText == null) return null;
         try {
             cipher = createCipher(Cipher.ENCRYPT_MODE);
+            log.debug("Successfully encrypted sensitive database column data.");
             return Base64.getEncoder().encodeToString(
                     cipher.doFinal(plainText.getBytes())
             );
         } catch (Exception e) {
+            log.error("Crypto Error: Failed to encrypt entity data. Target AES configuration might be corrupted.", e);
             throw new IllegalStateException("Error encrypting secret data", e);
         }
     }
@@ -54,10 +59,12 @@ public class SecretEncryptionConverter implements AttributeConverter<String, Str
         if (encryptedText == null) return null;
         try {
             cipher = createCipher(Cipher.DECRYPT_MODE);
+            log.debug("Successfully decrypted sensitive column data into plaintext.");
             return new String(
                     cipher.doFinal(Base64.getDecoder().decode(encryptedText))
             );
         } catch (Exception e) {
+            log.error("Crypto Error: Decryption failed. The encryption key or data padding might be invalid.", e);
             throw new IllegalStateException("Error decrypting secret data", e);
         }
     }
