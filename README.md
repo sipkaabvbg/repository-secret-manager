@@ -4,11 +4,23 @@
 This project is a subsystem of a CI/CD platform. It provides a web service and a graphical user interface (GUI) designed to securely manage repository URLs and the secrets required for authenticating against them. 
 
 ## Features
-- **Repository Management:** Add, list, and delete external repositories (e.g., GitHub, GitLab).
-- **Secrets Management:** Securely add, link, and delete authentication secrets.
-- **Dynamic Relationship:** Link repositories to secrets or keep them public.
-- **Real-time Validation:** Validate if a repository's linked secret provides successful authentication (read access) against the external provider (GitHub API).
-- **Responsive UI:** Clean and dynamic SAPUI5 interface for seamless user experience.
+### Secrets Management Dashboard (SAPUI5 UI Preview)
+The "Secrets" tab provides a centralized configuration panel where users can securely manage sensitive credentials before linking them to code repositories.
+* **Dynamic Secret Type Selection:** The form supports granular authentication methods depending on the Selected Provider. For GitHub, users can choose between standard **Personal Access Token (PAT)** or plan ahead for **SSH Private Key** deployment.
+* **Input Masking & Privacy:** The credential input field (Token/Password) is fully masked by default to protect sensitive keys from over-the-shoulder viewing during data entry.
+* **Persisted Credentials Inventory:** The responsive table at the bottom tracks all encrypted secrets currently stored in the database. It provides an at-a-glance overview of the Secret Name, Provider, and Token Type, along with immediate management actions.
+* **Inline Operations (Actions):** Each secret row features intuitive controls for editing existing configurations or triggering a safe deletion flow.
+![Secrets Management Interface](images/secrets_tab.png)
+
+### Repositories Management Dashboard (SAPUI5 UI Preview)
+
+The "Repositories" tab handles the registration and tracking of external source code repositories, mapping them dynamically to the predefined secrets when required.
+* **Dynamic Secret Association (Nullable Relation):** The dropdown menu highlights the application's ability to handle both private and open-source workflows. Users can explicitly select an existing credential profile (`secret_1`, `secret_2`) or choose **`-- Public (No Secret) --`**. Choosing the public option transparently passes a null payload to the JPA layer, saving a `NULL` foreign key in the database.
+* **Granular Repository Attributes:** The registration form accepts user-defined local alias names along with the absolute VCS target URL (e.g., GitHub HTTPS repository links).
+* **Consolidated Data Grid:** The table at the bottom serves as an inventory list, displaying active repositories, their remote locations, and the specific secret key names they are bound to.
+* **Lifecycle Controls:** Features built-in action hooks for triggering update procedures or complete removal cascades directly via the user interface.
+![Secrets Management Interface](images/repo_tab.png)
+
 
 ## Tech Stack
 - **Backend:** Java 25, Spring Boot 4, Spring Data JPA, H2 Database (In-Memory)
