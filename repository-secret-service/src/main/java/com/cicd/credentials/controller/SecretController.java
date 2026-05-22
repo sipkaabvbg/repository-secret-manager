@@ -1,7 +1,8 @@
 package com.cicd.credentials.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.cicd.credentials.dto.*;
-import com.cicd.credentials.entity.SecretEntity;
 import com.cicd.credentials.service.SecretService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @RequestMapping("/secrets")
 public class SecretController {
 
+    private static final Logger log = LoggerFactory.getLogger(SecretController.class);
     private final SecretService secretService;
 
     /**
@@ -35,26 +37,22 @@ public class SecretController {
      */
     @PostMapping
     public ResponseEntity<SecretCreatedResponse> create(@RequestBody SecretCreateRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(secretService.create(request));
+        log.info("Received request to create a new secret with name: {} and provider: {}", request.name(), request.provider());
+        SecretCreatedResponse response = secretService.create(request);
+        log.info("Successfully created secret with generated ID: {}", response.id());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     /**
      * Endpoint to list all persisted secrets in the system.
      * * @return A list of all stored secrets.
      */
     @GetMapping
-    public List<SecretDetailsResponse> getAll() {
-        List<SecretEntity> secretEntities = secretService.findAll();
-        return secretEntities.stream()
-                .map(entity -> new SecretDetailsResponse(
-                        entity.getId(),
-                        entity.getName(),
-                        entity.getProvider(),
-                        entity.getSecretType(),
-                        false // Forces 'editable' to be false initially so SAPUI5 renders read-only texts
-                ))
-                .toList();
+    public ResponseEntity<List<SecretDetailsResponse>> getAll() {
+        log.info("Received request to fetch all stored secrets");
+        List<SecretDetailsResponse> secrets = secretService.findAllDto();
+        log.info("Successfully retrieved {} secrets from the system", secrets.size());
+        return ResponseEntity.ok(secrets);
     }
-
     /**
      * Endpoint to delete a secret by its unique identifier.
      * * @param id The ID of the secret to be deleted.
@@ -62,16 +60,18 @@ public class SecretController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
+        log.info("Received request to delete secret with ID: {}", id);
         try {
             secretService.delete(id);
+            log.info("Secret with ID: {} was successfully deleted", id);
             return ResponseEntity.noContent().build();
         } catch (IllegalStateException e) {
+            log.error("Failed to delete secret with ID: {}. Error: {}", id, e.getMessage());
             return ResponseEntity
                     .badRequest()
                     .body(e.getMessage());
         }
     }
-
     /**
      * Updates an existing secret repository by its unique identifier.
      * Receives the updated configuration fields (name, provider, secretType, secretValue)
@@ -86,7 +86,9 @@ public class SecretController {
             @PathVariable UUID id,
             @RequestBody SecretCreateRequest request
     ) {
-        SecretCreatedResponse updatedRepo =  secretService.update(id, request);
-        return ResponseEntity.ok(updatedRepo);
+        log.info("Received request to update secret with ID: {}. New name: {}, provider: {}", id, request.name(), request.provider());
+        SecretCreatedResponse updatedSecret = secretService.update(id, request);
+        log.info("Secret with ID: {} was successfully updated", id);
+        return ResponseEntity.ok(updatedSecret);
     }
 }

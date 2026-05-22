@@ -1,7 +1,8 @@
 package com.cicd.credentials.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.cicd.credentials.dto.*;
-import com.cicd.credentials.entity.ExternalRepoEntity;
 import com.cicd.credentials.entity.SecretEntity;
 import com.cicd.credentials.repository.ExternalRepoRepository;
 import com.cicd.credentials.repository.SecretRepository;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @Service
 public class SecretService {
 
+    private static final Logger log = LoggerFactory.getLogger(SecretService.class);
     private final SecretRepository secretRepository;
     private final ExternalRepoRepository externalRepoRepository;
 
@@ -51,10 +53,19 @@ public class SecretService {
      * Retrieves all authentication secrets from the database.
      * @return a list of all registered SecretEntity objects
      */
-    public List<SecretEntity> findAll() {
-        return secretRepository.findAll();
-    }
+    public List<SecretDetailsResponse> findAllDto() {
+        List<SecretEntity> secretEntities = secretRepository.findAll();
 
+        return secretEntities.stream()
+                .map(entity -> new SecretDetailsResponse(
+                        entity.getId(),
+                        entity.getName(),
+                        entity.getProvider(),
+                        entity.getSecretType(),
+                        false
+                ))
+                .toList();
+    }
     /**
      * Deletes an authentication secret by its unique identifier.
      * Throws an exception if the secret is currently linked to any repository.
@@ -63,6 +74,7 @@ public class SecretService {
      */
     @Transactional
     public void delete(UUID id) {
+        log.info("Service layer execution: attempting to delete secret with ID: {}", id);
         if (!secretRepository.existsById(id)) {
             throw new RuntimeException("Secret not found with id: " + id);
         }
@@ -71,6 +83,7 @@ public class SecretService {
             throw new IllegalStateException("Cannot delete this secret because it is linked to repository.");
         }
         secretRepository.deleteById(id);
+        log.info("Secret ID {} was successfully removed from database", id);
     }
 
     /**
