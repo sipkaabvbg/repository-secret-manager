@@ -48,9 +48,16 @@ sap.ui.define([
                         if (oSecret.editable === undefined) {
                             oSecret.editable = false; 
                         }
+                        if (oSecret.githubType && !oSecret.secretType) {
+                            oSecret.secretType = oSecret.githubType;
+                        }
+
+                        if (!oSecret.secretType) {
+                            oSecret.secretType = "TOKEN"; 
+                        }
                     });
 
-				   // 1. Path for the Secrets tab table (contains only DB records)
+                    // 1. Path for the Secrets tab table (contains only DB records)
                     oModel.setProperty("/secrets", aRawSecrets);
 
                     // 2. Separate deep copy path specifically for the Repo creation dropdown select control
@@ -59,7 +66,8 @@ sap.ui.define([
                     // Prepend the Public option exclusively to the dropdown data set
                     aDropdownData.unshift({
                         id: "",
-                        name: "-- Public (No Secret) --"
+                        name: "-- Public (No Secret) --",
+                        secretType: "TOKEN"
                     });
 
                     // Update the isolated dropdown model path
@@ -68,10 +76,10 @@ sap.ui.define([
                 }.bind(this))
                 .catch(function (oError) {
                     oModel.setProperty("/secrets", []);
-                    oModel.setProperty("/dropdownSecrets", [{ id: "", name: "-- Public (No Secret) --" }]);
-                    MessageToast.show("Error loading secrets: " + oError.message);
+                    oModel.setProperty("/dropdownSecrets", [{ id: "", name: "-- Public (No Secret) --", secretType: "TOKEN" }]);
+                    sap.m.MessageToast.show("Error loading secrets: " + oError.message);
                 });
-        },
+            },
         /*
          * Sends a new secret object payload to the backend
          */
