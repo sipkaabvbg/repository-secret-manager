@@ -443,27 +443,57 @@ sap.ui.define([
 
         // 3. Triggered when clicking the Save button (the diskette icon)
         onSaveSecret: function (oEvent) {
-            var oContext = oEvent.getSource().getBindingContext();
+            var oButton = oEvent.getSource(); // The specific save button that was clicked
+            var oContext = oButton.getBindingContext();
             var oModel = oContext.getModel();
             var sPath = oContext.getPath();
-            var oEditedSecret = oContext.getObject(); // Retrieve updated data from the model
+            var oEditedSecret = oContext.getObject(); // Current row data from the model
 
-            // Send HTTP PUT request to update the secret inside the Spring Boot database
-            fetch(this.secretsUrl+"/" + oEditedSecret.id, {
+            // 1. Get the reference to the row container (ColumnListItem) directly from the button
+            var oRow = oButton.getParent().getParent(); 
+
+            // 2. Get all cells array from the current row
+            var aCells = oRow.getCells();
+
+            // 3. Extract Secret Type value from Cell [2]
+            var oTypeVBox = aCells[2];
+            // Find the Select control inside this VBox container
+            var oTypeSelect = oTypeVBox.getItems().find(function(oItem) {
+                return oItem.getMetadata().getName() === "sap.m.Select";
+            });
+            var sSecretType = oTypeSelect ? oTypeSelect.getSelectedKey() : "";
+
+            // 4. Extract Token/Password value from Cell [3]
+            var oTokenVBox = aCells[3];
+            // Find the Input control inside this VBox container
+            var oTokenInput = oTokenVBox.getItems().find(function(oItem) {
+                return oItem.getMetadata().getName() === "sap.m.Input";
+            });
+            var sNewPassword = oTokenInput ? oTokenInput.getValue() : "";
+
+            // Send HTTP PUT request to sync the updated secret data back to the Spring Boot backend
+            fetch(this.secretsUrl + "/" + oEditedSecret.id, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
                     name: oEditedSecret.name,
-                    provider: oEditedSecret.provider
+                    provider: oEditedSecret.provider,
+                    secretType: sSecretType,   // Payload property matching your backend field
+                    secretValue: sNewPassword  // Injecting the newly grabbed token/password string
                 })
             })
             .then(function (response) {
                 if (response.ok) {
                     sap.m.MessageToast.show("Secret updated successfully!");
                     
-                    // Lock the row back into read-only mode
+                    // Clear the password input field after a successful save operation for security
+                    if (oTokenInput) {
+                        oTokenInput.setValue("");
+                    }
+
+                    // Lock the table row back into read-only mode
                     oModel.setProperty(sPath + "/editable", false);
                 } else {
                     sap.m.MessageToast.show("Failed to update secret.");
