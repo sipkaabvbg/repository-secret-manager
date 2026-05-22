@@ -20,9 +20,17 @@ The "Repositories" tab handles the registration and tracking of external source 
 * **Granular Repository Attributes:** The registration form accepts user-defined local alias names along with the absolute VCS target URL (e.g., GitHub HTTPS repository links).
 * **Consolidated Data Grid:** The table at the bottom serves as an inventory list, displaying active repositories, their remote locations, and the specific secret key names they are bound to.
 * **Lifecycle Controls:** Features built-in action hooks for triggering update procedures or complete removal cascades directly via the user interface.
+
 ![Secrets Management Interface](images/repo_tab.png)
 
+* **Real-time API Validation Engine:** The interface features an interactive **Validate** routine. The UI dynamically captures the response and renders precise status feedbacks:
+  - **Success State:** If the token provides valid read access, a success confirmation is displayed:
+    > `Success: Repository credentials are VALID.`
+  - **Failure State (Error Parsing):** If the validation fails, the system bubbles up the exact raw response payload from the Git provider for precise debugging:
+    > `Error: INVALID credentials. 401 Unauthorized on GET request for "https://api.github.com/repos/sipkaabvbg/chat212": "{ "message": "Bad credentials", "documentation_url": "https://docs.github.com/rest", "status": "401" }"`
 
+   ![Secrets Management Interface](images/repo_tab_error.png)
+ 
 ## Tech Stack
 - **Backend:** Java 25, Spring Boot 4, Spring Data JPA, H2 Database (In-Memory)
 - **Frontend:** JavaScript, SAPUI5, Node.js
