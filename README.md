@@ -10,6 +10,7 @@ The "Secrets" tab provides a centralized configuration panel where users can sec
 * **Input Masking & Privacy:** The credential input field (Token/Password) is fully masked by default to protect sensitive keys from over-the-shoulder viewing during data entry.
 * **Persisted Credentials Inventory:** The responsive table at the bottom tracks all encrypted secrets currently stored in the database. It provides an at-a-glance overview of the Secret Name, Provider, and Token Type, along with immediate management actions.
 * **Inline Operations (Actions):** Each secret row features intuitive controls for editing existing configurations or triggering a safe deletion flow.
+* **Inline Operations (Actions) & Integrity Protection:** Each secret row features intuitive controls for editing configurations or triggering a deletion flow. To ensure strict data integrity, the Spring Boot backend performs a validation check prior to removal; **a secret cannot be deleted if it is actively linked to a repository**. If a user attempts to delete a bound secret, the system rejects the operation and displays a graceful validation message.
 ![Secrets Management Interface](images/secrets_tab.png)
 
 ### Repositories Management Dashboard (SAPUI5 UI Preview)
@@ -205,3 +206,20 @@ Currently, unit tests are implemented exclusively for some backend component to 
 cd repository-secret-service
 ./mvnw test
 ```
+
+## Future Enhancements
+
+While the system successfully demonstrates core integration capabilities and robust architectural design patterns, the following improvements are targeted for future iterations to make the subsystem fully production-ready:
+
+### 1. Expanded Provider & Authentication Support
+* **GitLab & Bitbucket Strategy Implementation:** Leverage the existing `CredentialValidator` strategy pattern to drop in dedicated HTTP client components for verifying GitLab and Bitbucket tokens.
+* **SSH Key Authentication:** Implement JSch or Apache MINA SSHD integration in the backend to support repository validation via private keys, complementing the frontend placeholder layout.
+
+### 2. Enterprise-Grade Security
+* **Uniqueness Validation (Preventing Duplicates):** Enhance both layers to prevent duplicate records (e.g., registering the exact same repository URL multiple times or creating secrets with duplicate names):
+  - **Backend:** Introduce custom validation logic and unique database constraints (`@Column(unique = true)`) to throw a clean `DuplicateResourceException` when a violation occurs.
+  - **Frontend (SAPUI5):** Implement real-time client-side checks and input validation to alert the user before they submit a duplicate entry, keeping the data clean.
+* **Secure Secret Management:** Replace the currently hardcoded AES encryption key.
+
+### 3. Resilience & DevOps Improvements
+* **Database Migration Framework:** Transition from the in-memory H2 database to a persistent containerized store (e.g., PostgreSQL).
