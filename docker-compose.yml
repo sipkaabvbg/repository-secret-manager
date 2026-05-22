@@ -9,6 +9,16 @@ services:
     networks:
       - cicd-network
 
+  frontend:
+    build:
+      context: ./repository-secret-ui
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+    networks:
+      - cicd-network
+
 networks:
   cicd-network:
     driver: bridge
