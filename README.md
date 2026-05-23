@@ -72,7 +72,7 @@ The application logic is structured into four distinct, isolated layers:
            │
            ▼
 [ 4. Database Layer ]      (H2 In-Memory — stores encrypted data at rest)
-
+```
 
 
 ### Architectural Layers Explained
